@@ -1,0 +1,37 @@
+/* Floating scroll-to-top button */
+
+.scroll-top-btn {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 999;
+  width: 48px; height: 48px;
+  border: none;
+  background: var(--orange);
+  color: var(--white);
+  cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  clip-path: polygon(0 0, 85% 0, 100% 15%, 100% 100%, 15% 100%, 0 85%);
+  box-shadow: 0 12px 32px rgba(232, 88, 11, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(20px) scale(0.9);
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(.2,.7,.2,1), background 0.2s;
+}
+.scroll-top-btn.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+.scroll-top-btn:hover { background: var(--orange-dark); }
+.scroll-top-btn:focus-visible {
+  outline: 3px solid var(--white);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px var(--orange-glow), 0 12px 32px rgba(232, 88, 11, 0.5);
+}
+@media (max-width: 640px) {
+  .scroll-top-btn { right: 16px; bottom: 16px; width: 44px; height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-top-btn { transition: opacity 0.2s ease; }
+}

@@ -1,0 +1,35 @@
+/* Design tokens: colors, fonts, Tailwind theme mapping, dark variant */
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--cream);
+  --color-foreground: var(--ink);
+  --color-primary: var(--orange);
+  --color-primary-foreground: var(--white);
+  --font-display: "Barlow Condensed", sans-serif;
+  --font-body: "Barlow", sans-serif;
+  --font-serif: "Lora", serif;
+}
+
+:root {
+  --orange: #E8580B;
+  --orange-dark: #C44A08;
+  --orange-glow: rgba(232, 88, 11, 0.15);
+  --orange-pale: #FFF3EC;
+  --black: #080808;
+  --ink: #111111;
+  --charcoal: #1A1A1A;
+  --dark: #242424;
+  --iron: #3A3A3A;
+  --mid: #666666;
+  --silver: #9A9A9A;
+  --smoke: #E8E4DF;
+  --cream: #F7F4F0;
+  --white: #FFFFFF;
+  --gold: #B8923A;
+
+  --font-display: "Barlow Condensed", sans-serif;
+  --font-body: "Barlow", sans-serif;
+  --font-serif: "Lora", serif;
+}

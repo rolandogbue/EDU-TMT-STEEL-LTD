@@ -1,0 +1,21 @@
+/* Global reset + document defaults */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--cream);
+  color: var(--ink);
+  overflow-x: hidden;
+  margin: 0;
+}
+
+a { color: inherit; }

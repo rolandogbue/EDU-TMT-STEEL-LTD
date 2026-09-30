@@ -1,0 +1,48 @@
+/* Proof / testimonial section */
+
+.proof-section {
+  background: var(--orange);
+  padding: 100px 60px;
+  position: relative; overflow: hidden;
+}
+.proof-inner {
+  max-width: 1000px; margin: 0 auto;
+  position: relative; text-align: center;
+}
+.proof-quote-mark {
+  font-family: var(--font-serif);
+  font-size: 120px; color: rgba(255, 255, 255, 0.25);
+  line-height: 0.7; margin-bottom: 32px;
+}
+.proof-text {
+  font-family: var(--font-serif);
+  font-size: clamp(20px, 3vw, 34px);
+  font-style: italic; color: var(--white);
+  line-height: 1.5; margin-bottom: 40px;
+}
+.proof-attribution {
+  font-size: 13px; font-weight: 600; letter-spacing: 3px;
+  text-transform: uppercase; color: rgba(255, 255, 255, 0.65);
+}
+.proof-divider {
+  width: 60px; height: 2px;
+  background: rgba(255, 255, 255, 0.3);
+  margin: 20px auto;
+}
+.proof-stats-row {
+  display: flex; justify-content: center;
+  gap: 64px; margin-top: 64px; padding-top: 64px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  flex-wrap: wrap;
+}
+.proof-stat-item { text-align: center; }
+.proof-stat-num {
+  font-family: var(--font-display);
+  font-size: 56px; font-weight: 900;
+  color: var(--white); line-height: 1;
+}
+.proof-stat-label {
+  font-size: 12px; font-weight: 600; letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6); margin-top: 8px;
+}

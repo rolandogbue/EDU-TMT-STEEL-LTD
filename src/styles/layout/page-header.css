@@ -1,0 +1,35 @@
+/* Subpage hero/page header */
+
+.page-hero {
+  background: var(--ink);
+  padding: 180px 60px 100px;
+  position: relative; overflow: hidden;
+}
+.page-hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 80px 80px;
+}
+.page-hero-inner {
+  max-width: 1200px; margin: 0 auto;
+  position: relative; z-index: 2;
+}
+.page-hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(48px, 7vw, 96px);
+  font-weight: 900; text-transform: uppercase;
+  color: var(--white); line-height: 0.95;
+  margin: 16px 0 24px; letter-spacing: -1px;
+}
+.page-hero-title em {
+  color: var(--orange); font-style: normal;
+}
+.page-hero-sub {
+  font-family: var(--font-serif);
+  font-size: 20px; font-style: italic;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.6; max-width: 640px;
+}

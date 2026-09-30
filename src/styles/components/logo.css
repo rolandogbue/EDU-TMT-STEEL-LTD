@@ -1,0 +1,9 @@
+/* Custom logo image (uploaded via admin) */
+
+.nav-logo-img {
+  height: 44px;
+  width: auto;
+  max-width: 180px;
+  object-fit: contain;
+  display: block;
+}

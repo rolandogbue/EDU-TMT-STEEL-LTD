@@ -1,0 +1,55 @@
+/*
+ * Global stylesheet entry.
+ *
+ * All rules live in modular partials under `src/styles/`, grouped by role:
+ *   base/        design tokens, reset, a11y helpers
+ *   layout/      site chrome (nav, footer, subpage headers)
+ *   sections/    homepage sections (hero, trust bar, about, ...)
+ *   components/  reusable widgets (buttons, logo, scroll-reveal, ...)
+ *   pages/       page-scoped styles (auth, admin, blog)
+ *   responsive.css  breakpoint overrides shared across sections
+ *
+ * Only `@import` rules belong here — Tailwind v4 (Lightning CSS) requires
+ * every `@import` to precede any other CSS.
+ */
+
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+/* Base */
+@import "./styles/base/tokens.css";
+@import "./styles/base/reset.css";
+@import "./styles/base/a11y.css";
+
+/* Layout */
+@import "./styles/layout/nav.css";
+@import "./styles/layout/footer.css";
+@import "./styles/layout/page-header.css";
+
+/* Sections */
+@import "./styles/sections/hero.css";
+@import "./styles/sections/trust-bar.css";
+@import "./styles/sections/about.css";
+@import "./styles/sections/products.css";
+@import "./styles/sections/services.css";
+@import "./styles/sections/why-us.css";
+@import "./styles/sections/audience.css";
+@import "./styles/sections/proof.css";
+@import "./styles/sections/cta.css";
+
+/* Components */
+@import "./styles/components/buttons.css";
+@import "./styles/components/logo.css";
+@import "./styles/components/product-media.css";
+@import "./styles/components/icons.css";
+@import "./styles/components/scroll-reveal.css";
+@import "./styles/components/scroll-to-top.css";
+
+/* Pages */
+@import "./styles/pages/auth.css";
+@import "./styles/pages/admin.css";
+@import "./styles/pages/blog.css";
+
+/* Responsive overrides (must come after the rules it overrides) */
+@import "./styles/responsive.css";

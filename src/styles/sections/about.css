@@ -1,0 +1,92 @@
+/* About section */
+
+.about-section {
+  padding: 120px 60px;
+  max-width: 1200px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1.2fr;
+  gap: 100px; align-items: center;
+}
+.about-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 4px;
+  text-transform: uppercase; color: var(--orange);
+  margin-bottom: 20px;
+  display: flex; align-items: center; gap: 12px;
+}
+.about-label::before {
+  content: ''; width: 32px; height: 2px;
+  background: var(--orange);
+}
+.about-title {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 5vw, 68px);
+  font-weight: 800; line-height: 0.95;
+  text-transform: uppercase; color: var(--ink);
+  margin: 0 0 32px;
+}
+.about-title em {
+  font-family: var(--font-serif);
+  font-style: italic; font-weight: 600;
+  color: var(--orange); font-size: 0.75em;
+  text-transform: none; display: block; line-height: 1.2;
+}
+.about-body {
+  font-size: 16px; font-weight: 300;
+  color: var(--mid); line-height: 1.9;
+  margin-bottom: 24px;
+}
+.about-body strong { color: var(--ink); font-weight: 600; }
+.about-signature {
+  display: flex; align-items: center; gap: 16px;
+  padding: 24px 0;
+  border-top: 1px solid var(--smoke);
+  margin-top: 16px;
+}
+.about-sig-line { width: 48px; height: 2px; background: var(--orange); }
+.about-sig-text {
+  font-family: var(--font-serif); font-style: italic;
+  font-size: 15px; color: var(--mid);
+}
+.about-right { position: relative; }
+.about-quote-block {
+  background: var(--ink); padding: 60px 52px;
+  position: relative; overflow: hidden;
+}
+.about-quote-block::before {
+  content: '"'; position: absolute;
+  top: -30px; right: 24px;
+  font-family: var(--font-serif); font-size: 200px;
+  color: rgba(232, 88, 11, 0.1);
+  line-height: 1; pointer-events: none;
+}
+.about-quote-accent {
+  width: 4px; height: 60px;
+  background: var(--orange); margin-bottom: 32px;
+}
+.about-quote-text {
+  font-family: var(--font-serif);
+  font-size: 24px; font-style: italic;
+  color: var(--white); line-height: 1.5; margin-bottom: 32px;
+}
+.about-quote-note {
+  font-size: 13px; color: rgba(255, 255, 255, 0.4);
+  line-height: 1.6;
+}
+.about-badge {
+  position: absolute; bottom: -24px; left: -24px;
+  background: var(--orange); color: var(--white);
+  width: 120px; height: 120px; border-radius: 50%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  font-family: var(--font-display); text-align: center;
+  box-shadow: 0 20px 60px rgba(232, 88, 11, 0.4);
+  animation: spin-slow 20s linear infinite;
+}
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.about-badge-num { font-size: 32px; font-weight: 900; line-height: 1; }
+.about-badge-text {
+  font-size: 9px; letter-spacing: 2px;
+  text-transform: uppercase; font-weight: 700; margin-top: 2px;
+}
