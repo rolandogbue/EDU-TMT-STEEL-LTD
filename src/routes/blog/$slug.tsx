@@ -19,12 +19,13 @@ type Post = {
   seo_description: string | null;
 };
 
-
 export const Route = createFileRoute("/blog/$slug")({
   loader: async ({ params }) => {
     const { data } = await supabase
       .from("blog_posts")
-      .select("id,title,slug,excerpt,body,cover_image,cover_image_srcset,published_at,author_name,seo_title,seo_description")
+      .select(
+        "id,title,slug,excerpt,body,cover_image,cover_image_srcset,published_at,author_name,seo_title,seo_description",
+      )
       .eq("slug", params.slug)
       .eq("status", "published")
 
@@ -36,7 +37,10 @@ export const Route = createFileRoute("/blog/$slug")({
   head: ({ loaderData }) => {
     if (!loaderData) return {};
     const title = loaderData.seo_title || `${loaderData.title} | EDU TMT Steel`;
-    const desc = loaderData.seo_description || loaderData.excerpt || "Read this post on the EDU TMT Steel blog.";
+    const desc =
+      loaderData.seo_description ||
+      loaderData.excerpt ||
+      "Read this post on the EDU TMT Steel blog.";
     return {
       meta: [
         { title },
@@ -44,7 +48,9 @@ export const Route = createFileRoute("/blog/$slug")({
         { property: "og:title", content: title },
         { property: "og:description", content: desc.slice(0, 160) },
         { property: "og:type", content: "article" },
-        ...(loaderData.cover_image ? [{ property: "og:image", content: loaderData.cover_image }] : []),
+        ...(loaderData.cover_image
+          ? [{ property: "og:image", content: loaderData.cover_image }]
+          : []),
         { name: "twitter:card", content: "summary_large_image" },
       ],
       links: [{ rel: "canonical", href: `/blog/${loaderData.slug}` }],
@@ -53,17 +59,27 @@ export const Route = createFileRoute("/blog/$slug")({
   notFoundComponent: () => (
     <section className="page-hero" style={{ minHeight: "80vh" }}>
       <div className="page-hero-inner" style={{ textAlign: "center" }}>
-        <h1 className="page-hero-title">Post <em>Not Found</em></h1>
+        <h1 className="page-hero-title">
+          Post <em>Not Found</em>
+        </h1>
         <p className="page-hero-sub">This post may have been unpublished or moved.</p>
-        <Link to="/blog" className="btn-large">Back to blog</Link>
+        <Link to="/blog" className="btn-large">
+          Back to blog
+        </Link>
       </div>
     </section>
   ),
-  errorComponent: ({ error }) => (
-    <section className="page-hero" style={{ minHeight: "60vh" }}>
-      <div className="page-hero-inner"><p>Couldn't load this post: {error.message}</p></div>
-    </section>
-  ),
+  errorComponent: ({ error }) => {
+    const message = error instanceof Error ? error.message : "An unexpected error occurred.";
+
+    return (
+      <section className="page-hero" style={{ minHeight: "60vh" }}>
+        <div className="page-hero-inner">
+          <p>Couldn't load this post: {message}</p>
+        </div>
+      </section>
+    );
+  },
   component: BlogPost,
 });
 
@@ -88,9 +104,15 @@ function BlogPost() {
     <article className="post-article">
       <header className="post-header">
         <div className="post-header-inner">
-          <Link to="/blog" className="post-back">← All posts</Link>
+          <Link to="/blog" className="post-back">
+            ← All posts
+          </Link>
           <time className="post-date">
-            {new Date(post.published_at).toLocaleDateString("en-NG", { year: "numeric", month: "long", day: "numeric" })}
+            {new Date(post.published_at).toLocaleDateString("en-NG", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
           </time>
           <h1 className="post-title">{post.title}</h1>
           {post.excerpt && <p className="post-excerpt">{post.excerpt}</p>}
@@ -110,14 +132,17 @@ function BlogPost() {
         </div>
       )}
 
-
       <div className="post-body-wrap">
         <div className="post-body">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.body}</ReactMarkdown>
         </div>
         {tags.length > 0 && (
           <div className="post-tags">
-            {tags.map((t) => <span key={t} className="post-tag">#{t}</span>)}
+            {tags.map((t) => (
+              <span key={t} className="post-tag">
+                #{t}
+              </span>
+            ))}
           </div>
         )}
       </div>

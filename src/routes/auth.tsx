@@ -37,9 +37,13 @@ function AuthPage() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null); setInfo(null);
+    setError(null);
+    setInfo(null);
     const parsed = schema.safeParse({ email, password });
-    if (!parsed.success) { setError(parsed.error.issues[0].message); return; }
+    if (!parsed.success) {
+      setError(parsed.error.issues[0].message);
+      return;
+    }
     setLoading(true);
     try {
       if (mode === "signup") {
@@ -62,25 +66,41 @@ function AuthPage() {
   };
 
   const bootstrapAdmin = async () => {
-    setError(null); setInfo(null); setBootstrapping(true);
+    setError(null);
+    setInfo(null);
+    setBootstrapping(true);
     try {
       const res = await fetch("/api/public/bootstrap-admin", { method: "POST" });
-      const json = (await res.json()) as { ok?: boolean; email?: string; password?: string; error?: string };
+      const json = (await res.json()) as {
+        ok?: boolean;
+        email?: string;
+        password?: string;
+        error?: string;
+      };
       if (!res.ok) setError(json.error ?? "Bootstrap failed");
       else if (json.ok && json.email && json.password) {
         setEmail(json.email);
         setPassword(json.password);
-        setInfo(`Default admin created — Email: ${json.email} · Password: ${json.password}. Sign in and change the password immediately.`);
+        setInfo(
+          `Default admin created — Email: ${json.email} · Password: ${json.password}. Sign in and change the password immediately.`,
+        );
       }
-    } catch { setError("Bootstrap failed"); }
-    finally { setBootstrapping(false); }
+    } catch {
+      setError("Bootstrap failed");
+    } finally {
+      setBootstrapping(false);
+    }
   };
 
   return (
     <div className="auth-shell">
       <div className="auth-card">
-        <Link to="/" className="auth-back">← Back to site</Link>
-        <h1 className="auth-title">{mode === "signin" ? "Admin Sign In" : "Create Admin Account"}</h1>
+        <Link to="/" className="auth-back">
+          ← Back to site
+        </Link>
+        <h1 className="auth-title">
+          {mode === "signin" ? "Admin Sign In" : "Create Admin Account"}
+        </h1>
         <p className="auth-sub">
           {mode === "signup"
             ? "First-time setup: use the configured admin email to become admin automatically."
@@ -89,26 +109,63 @@ function AuthPage() {
         <form onSubmit={submit} className="auth-form">
           <label>
             <span>Email</span>
-            <input type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} maxLength={255} />
+            <input
+              type="email"
+              autoComplete="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              maxLength={255}
+            />
           </label>
           <label>
             <span>Password</span>
-            <input type="password" autoComplete={mode === "signin" ? "current-password" : "new-password"} required minLength={8} maxLength={72} value={password} onChange={(e) => setPassword(e.target.value)} />
+            <input
+              type="password"
+              autoComplete={mode === "signin" ? "current-password" : "new-password"}
+              required
+              minLength={8}
+              maxLength={72}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
           </label>
-          {error && <div className="auth-error" role="alert">{error}</div>}
-          {info && <div className="auth-info" role="status">{info}</div>}
+          {error && (
+            <div className="auth-error" role="alert">
+              {error}
+            </div>
+          )}
+          {info && (
+            <div className="auth-info" role="status">
+              {info}
+            </div>
+          )}
           <button type="submit" className="btn-large" disabled={loading}>
             {loading ? "Please wait…" : mode === "signin" ? "Sign In" : "Create Account"}
           </button>
         </form>
-        <button type="button" className="auth-toggle" onClick={() => setMode(mode === "signin" ? "signup" : "signin")}>
-          {mode === "signin" ? "First time? Create the admin account →" : "Already have an account? Sign in →"}
+        <button
+          type="button"
+          className="auth-toggle"
+          onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+        >
+          {mode === "signin"
+            ? "First time? Create the admin account →"
+            : "Already have an account? Sign in →"}
         </button>
         <div className="auth-bootstrap">
-          <button type="button" className="auth-link" onClick={bootstrapAdmin} disabled={bootstrapping}>
+          <button
+            type="button"
+            className="auth-link"
+            onClick={bootstrapAdmin}
+            disabled={bootstrapping}
+          >
             {bootstrapping ? "Creating default admin…" : "Create default admin (first-run only)"}
           </button>
-          <p className="auth-hint">One-time setup: creates the admin account with a default password so you can sign in and change it right away.</p>
+          <p className="auth-hint">
+            One-time setup: creates the admin account with a default password so you can sign in and
+            change it right away.
+          </p>
         </div>
       </div>
     </div>

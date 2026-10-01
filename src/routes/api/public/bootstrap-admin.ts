@@ -6,15 +6,13 @@ export const Route = createFileRoute("/api/public/bootstrap-admin")({
   server: {
     handlers: {
       POST: async () => {
-        const { isServiceRoleConfigured, ADMIN_KEY_MISSING_MESSAGE } = await import(
-          "@/lib/supabase-admin.server"
-        );
+        const { isServiceRoleConfigured, ADMIN_KEY_MISSING_MESSAGE } =
+          await import("@/lib/supabase-admin.server");
         if (!isServiceRoleConfigured()) {
           return Response.json({ error: ADMIN_KEY_MISSING_MESSAGE }, { status: 503 });
         }
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
 
         // Refuse if any admin already exists.
         const { data: existing, error: existingErr } = await supabaseAdmin
@@ -32,7 +30,8 @@ export const Route = createFileRoute("/api/public/bootstrap-admin")({
           .select("admin_email")
           .eq("id", 1)
           .maybeSingle();
-        if (setErr || !settings) return Response.json({ error: "Missing site settings" }, { status: 500 });
+        if (setErr || !settings)
+          return Response.json({ error: "Missing site settings" }, { status: 500 });
 
         const email = settings.admin_email;
 
@@ -42,7 +41,10 @@ export const Route = createFileRoute("/api/public/bootstrap-admin")({
           email_confirm: true,
         });
         if (createErr || !created.user) {
-          return Response.json({ error: createErr?.message ?? "Failed to create admin" }, { status: 500 });
+          return Response.json(
+            { error: createErr?.message ?? "Failed to create admin" },
+            { status: 500 },
+          );
         }
 
         // grant_admin_on_signup trigger inserts the role automatically.

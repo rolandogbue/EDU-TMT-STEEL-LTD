@@ -1,4 +1,4 @@
-import defaultLogo from "@/assets/Logo(Edu).PNG";
+import defaultLogo from "@/assets/edu-logo.png";
 
 /**
  * Brand configuration.

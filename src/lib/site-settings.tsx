@@ -7,7 +7,11 @@ export type SiteSettings = {
   admin_email: string;
 };
 
-const DEFAULT: SiteSettings = { logo_url: null, favicon_url: null, admin_email: "admin@domain.com" };
+const DEFAULT: SiteSettings = {
+  logo_url: null,
+  favicon_url: null,
+  admin_email: "admin@domain.com",
+};
 
 const SiteSettingsCtx = createContext<{
   settings: SiteSettings;

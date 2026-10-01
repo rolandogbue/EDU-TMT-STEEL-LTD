@@ -7,6 +7,7 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import type { ErrorComponentProps } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 
 import appCss from "../styles.css?url";
@@ -22,12 +23,18 @@ function NotFoundComponent() {
       <SiteHeader />
       <main className="page-hero" style={{ minHeight: "100vh" }}>
         <div className="page-hero-inner" style={{ textAlign: "center" }}>
-          <div className="section-label-light" style={{ justifyContent: "center" }}>404</div>
-          <h1 className="page-hero-title">Page <em>Not Found</em></h1>
+          <div className="section-label-light" style={{ justifyContent: "center" }}>
+            404
+          </div>
+          <h1 className="page-hero-title">
+            Page <em>Not Found</em>
+          </h1>
           <p className="page-hero-sub" style={{ margin: "0 auto 32px" }}>
             The page you're looking for doesn't exist or has been moved.
           </p>
-          <Link to="/" className="btn-large">Return Home</Link>
+          <Link to="/" className="btn-large">
+            Return Home
+          </Link>
         </div>
       </main>
       <SiteFooter />
@@ -35,7 +42,7 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
   return (
@@ -43,14 +50,28 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
       <SiteHeader />
       <main className="page-hero" style={{ minHeight: "100vh" }}>
         <div className="page-hero-inner" style={{ textAlign: "center" }}>
-          <div className="section-label-light" style={{ justifyContent: "center" }}>Error</div>
-          <h1 className="page-hero-title">Something <em>Went Wrong</em></h1>
+          <div className="section-label-light" style={{ justifyContent: "center" }}>
+            Error
+          </div>
+          <h1 className="page-hero-title">
+            Something <em>Went Wrong</em>
+          </h1>
           <p className="page-hero-sub" style={{ margin: "0 auto 32px" }}>
             We hit a snag loading this page. Try again or head home.
           </p>
           <div className="cta-buttons">
-            <button onClick={() => { router.invalidate(); reset(); }} className="btn-large">Try Again</button>
-            <Link to="/" className="btn-outline">Go Home</Link>
+            <button
+              onClick={() => {
+                router.invalidate();
+                reset();
+              }}
+              className="btn-large"
+            >
+              Try Again
+            </button>
+            <Link to="/" className="btn-outline">
+              Go Home
+            </Link>
           </div>
         </div>
       </main>
@@ -71,9 +92,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Abuja's trusted building materials partner. TMT rods, BRC wire mesh, cement, roofing sheets and more with fast delivery, expert estimation and 24/7 support.",
       },
       { name: "author", content: "EDU TMT Steel Limited" },
-      { name: "keywords", content: "TMT rods Abuja, building materials Nigeria, BRC wire mesh, cement supplier Abuja, steel rods FCT, construction materials Abuja" },
+      {
+        name: "keywords",
+        content:
+          "TMT rods Abuja, building materials Nigeria, BRC wire mesh, cement supplier Abuja, steel rods FCT, construction materials Abuja",
+      },
       { property: "og:title", content: "EDU TMT Steel Limited — Built to Build Abuja" },
-      { property: "og:description", content: "Premium building materials with complete project support across Abuja and the FCT." },
+      {
+        property: "og:description",
+        content:
+          "Premium building materials with complete project support across Abuja and the FCT.",
+      },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "EDU TMT Steel Limited" },
       { property: "og:locale", content: "en_NG" },
@@ -141,7 +170,9 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <SiteSettingsProvider>
         <AuthProvider>
-          <a href="#main-content" className="skip-link">Skip to main content</a>
+          <a href="#main-content" className="skip-link">
+            Skip to main content
+          </a>
           <SiteHeader />
           <main id="main-content" tabIndex={-1}>
             <Outlet />

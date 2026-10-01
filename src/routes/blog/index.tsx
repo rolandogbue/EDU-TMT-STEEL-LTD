@@ -5,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Reveal } from "@/components/reveal";
 import { buildSrcSet } from "@/lib/image-resize";
 
-
 const POSTS_PER_PAGE = 9;
 
 const searchSchema = z.object({
@@ -17,9 +16,16 @@ export const Route = createFileRoute("/blog/")({
   head: () => ({
     meta: [
       { title: "Blog & Insights | EDU TMT Steel — Construction in Abuja" },
-      { name: "description", content: "Practical guides, project updates and construction insights from EDU TMT Steel — Abuja's trusted building materials partner." },
+      {
+        name: "description",
+        content:
+          "Practical guides, project updates and construction insights from EDU TMT Steel — Abuja's trusted building materials partner.",
+      },
       { property: "og:title", content: "EDU TMT Steel Blog — Building Insights for Abuja" },
-      { property: "og:description", content: "Guides and updates on TMT rods, cement, roofing and construction best practices." },
+      {
+        property: "og:description",
+        content: "Guides and updates on TMT rods, cement, roofing and construction best practices.",
+      },
       { property: "og:url", content: "/blog" },
     ],
     links: [{ rel: "canonical", href: "/blog" }],
@@ -38,7 +44,6 @@ type Post = {
   author_name: string | null;
 };
 
-
 function BlogIndex() {
   const { page } = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
@@ -52,7 +57,9 @@ function BlogIndex() {
     setLoading(true);
     supabase
       .from("blog_posts")
-      .select("id,title,slug,excerpt,cover_image,cover_image_srcset,published_at,author_name", { count: "exact" })
+      .select("id,title,slug,excerpt,cover_image,cover_image_srcset,published_at,author_name", {
+        count: "exact",
+      })
       .eq("status", "published")
       .lte("published_at", new Date().toISOString())
       .order("published_at", { ascending: false })
@@ -76,7 +83,9 @@ function BlogIndex() {
         <div className="page-hero-inner">
           <div className="section-label-light">Blog</div>
           <h1 id="blog-hero" className="page-hero-title">
-            Insights for<br />Better <em>Builds.</em>
+            Insights for
+            <br />
+            Better <em>Builds.</em>
           </h1>
           <p className="page-hero-sub">
             Guides, project updates and material knowledge from Abuja's construction frontline.
@@ -91,7 +100,13 @@ function BlogIndex() {
           ) : posts.length === 0 ? (
             <p className="blog-empty">
               {page > 1 ? (
-                <>No posts on this page. <Link to="/blog" search={{ page: 1 }}>Back to page 1</Link>.</>
+                <>
+                  No posts on this page.{" "}
+                  <Link to="/blog" search={{ page: 1 }}>
+                    Back to page 1
+                  </Link>
+                  .
+                </>
               ) : (
                 "No posts published yet — check back soon."
               )}
@@ -117,11 +132,17 @@ function BlogIndex() {
 
                       <div className="blog-card-body">
                         <time className="blog-card-date">
-                          {new Date(p.published_at).toLocaleDateString("en-NG", { year: "numeric", month: "short", day: "numeric" })}
+                          {new Date(p.published_at).toLocaleDateString("en-NG", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })}
                         </time>
                         <h2 className="blog-card-title">{p.title}</h2>
                         {p.excerpt && <p className="blog-card-excerpt">{p.excerpt}</p>}
-                        {p.author_name && <div className="blog-card-author">By {p.author_name}</div>}
+                        {p.author_name && (
+                          <div className="blog-card-author">By {p.author_name}</div>
+                        )}
                       </div>
                     </Link>
                   </Reveal>
@@ -141,7 +162,9 @@ function BlogIndex() {
                   <ul className="blog-page-list">
                     {pageNumbers.map((n, idx) =>
                       n === "…" ? (
-                        <li key={`gap-${idx}`} className="blog-page-gap" aria-hidden="true">…</li>
+                        <li key={`gap-${idx}`} className="blog-page-gap" aria-hidden="true">
+                          …
+                        </li>
                       ) : (
                         <li key={n}>
                           <Link

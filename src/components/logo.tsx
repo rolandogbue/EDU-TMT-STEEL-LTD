@@ -9,13 +9,7 @@ export function Logo({ onClick, style }: { onClick?: () => void; style?: React.C
   return (
     <Link to="/" className="nav-logo" onClick={onClick} style={style}>
       {logoSrc ? (
-        <img
-          src={logoSrc}
-          alt={BRANDING.logoAlt}
-          className="nav-logo-img"
-          width={44}
-          height={44}
-        />
+        <img src={logoSrc} alt={BRANDING.logoAlt} className="nav-logo-img" width={44} height={44} />
       ) : (
         <>
           <div className="nav-logo-icon">{BRANDING.shortMark}</div>

@@ -41,9 +41,7 @@ function AdminDashboard() {
             .eq("user_id", authData.user.id);
 
           if (!isMounted) return;
-          setCanManageSettings(
-            !rolesError && (roles ?? []).some(({ role }) => role === "admin"),
-          );
+          setCanManageSettings(!rolesError && (roles ?? []).some(({ role }) => role === "admin"));
         }
 
         const { data: posts, error: postsError } = await supabase
@@ -100,9 +98,7 @@ function AdminDashboard() {
       <h1 id="admin-dashboard-title" className="admin-h1">
         Dashboard
       </h1>
-      <p className="admin-lead">
-        Manage your blog, branding and site settings from here.
-      </p>
+      <p className="admin-lead">Manage your blog, branding and site settings from here.</p>
 
       {error && (
         <div className="admin-alert error" role="alert">

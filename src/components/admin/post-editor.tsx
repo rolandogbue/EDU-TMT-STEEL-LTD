@@ -4,7 +4,6 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { COVER_WIDTHS, buildSrcSet, resizeCoverImage } from "@/lib/image-resize";
 
-
 type Category = { id: string; name: string };
 type Status = "draft" | "published" | "scheduled";
 
@@ -23,7 +22,13 @@ const toDateTimeLocalValue = (value: string | Date | null | undefined) => {
   return new Date(date.getTime() - date.getTimezoneOffset() * 60_000).toISOString().slice(0, 16);
 };
 
-export function PostEditor({ postId, onSaved }: { postId?: string; onSaved?: (id: string) => void }) {
+export function PostEditor({
+  postId,
+  onSaved,
+}: {
+  postId?: string;
+  onSaved?: (id: string) => void;
+}) {
   const [loading, setLoading] = useState(!!postId);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -61,15 +66,23 @@ export function PostEditor({ postId, onSaved }: { postId?: string; onSaved?: (id
   };
 
   useEffect(() => {
-    supabase.from("blog_categories").select("id,name").order("name").then(({ data }) => {
-      setCategories((data ?? []) as Category[]);
-    });
+    supabase
+      .from("blog_categories")
+      .select("id,name")
+      .order("name")
+      .then(({ data }) => {
+        setCategories((data ?? []) as Category[]);
+      });
   }, []);
 
   useEffect(() => {
     if (!postId) return;
     (async () => {
-      const { data: post } = await supabase.from("blog_posts").select("*").eq("id", postId).maybeSingle();
+      const { data: post } = await supabase
+        .from("blog_posts")
+        .select("*")
+        .eq("id", postId)
+        .maybeSingle();
       if (post) {
         setTitle(post.title ?? "");
         setSlug(post.slug ?? "");
@@ -133,32 +146,45 @@ export function PostEditor({ postId, onSaved }: { postId?: string; onSaved?: (id
     }
   }, []);
 
-
   const upsertTags = async (postId: string, tagString: string) => {
-    const names = tagString.split(",").map((t) => t.trim()).filter(Boolean);
+    const names = tagString
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean);
     if (!names.length) {
       await supabase.from("blog_post_tags").delete().eq("post_id", postId);
       return;
     }
     // Upsert tags
     const tagRows = names.map((n) => ({ name: n, slug: slugify(n) }));
-    await supabase.from("blog_tags").upsert(tagRows, { onConflict: "slug", ignoreDuplicates: true });
-    const { data: existing } = await supabase.from("blog_tags").select("id,slug").in(
-      "slug",
-      names.map(slugify),
-    );
+    await supabase
+      .from("blog_tags")
+      .upsert(tagRows, { onConflict: "slug", ignoreDuplicates: true });
+    const { data: existing } = await supabase
+      .from("blog_tags")
+      .select("id,slug")
+      .in("slug", names.map(slugify));
     const ids = (existing ?? []).map((t) => t.id);
     await supabase.from("blog_post_tags").delete().eq("post_id", postId);
     if (ids.length) {
-      await supabase.from("blog_post_tags").insert(ids.map((tag_id) => ({ post_id: postId, tag_id })));
+      await supabase
+        .from("blog_post_tags")
+        .insert(ids.map((tag_id) => ({ post_id: postId, tag_id })));
     }
   };
 
   const save = async () => {
-    setError(null); setMsg(null);
-    if (!title.trim()) { setError("Title is required"); return; }
+    setError(null);
+    setMsg(null);
+    if (!title.trim()) {
+      setError("Title is required");
+      return;
+    }
     const finalSlug = slug.trim() || slugify(title);
-    if (!finalSlug) { setError("A URL slug is required"); return; }
+    if (!finalSlug) {
+      setError("A URL slug is required");
+      return;
+    }
     const scheduledDate = status === "scheduled" && publishedAt ? new Date(publishedAt) : null;
     const hasValidSchedule =
       !!scheduledDate &&
@@ -201,7 +227,11 @@ export function PostEditor({ postId, onSaved }: { postId?: string; onSaved?: (id
         const { error } = await supabase.from("blog_posts").update(payload).eq("id", id);
         if (error) throw error;
       } else {
-        const { data, error } = await supabase.from("blog_posts").insert(payload).select("id").single();
+        const { data, error } = await supabase
+          .from("blog_posts")
+          .insert(payload)
+          .select("id")
+          .single();
         if (error) throw error;
         id = data.id;
       }
@@ -242,7 +272,11 @@ export function PostEditor({ postId, onSaved }: { postId?: string; onSaved?: (id
         </div>
       </div>
 
-      {error && <div className="admin-alert error" role="alert">{error}</div>}
+      {error && (
+        <div className="admin-alert error" role="alert">
+          {error}
+        </div>
+      )}
       {msg && <div className="admin-alert ok">{msg}</div>}
 
       <div className="editor-grid">
@@ -255,18 +289,31 @@ export function PostEditor({ postId, onSaved }: { postId?: string; onSaved?: (id
             <span>URL slug</span>
             <input
               value={slug}
-              onChange={(e) => { setSlug(e.target.value); setSlugTouched(true); }}
+              onChange={(e) => {
+                setSlug(e.target.value);
+                setSlugTouched(true);
+              }}
               maxLength={80}
               placeholder="my-post-slug"
             />
           </label>
           <label className="admin-field">
             <span>Excerpt (shown on the blog index)</span>
-            <textarea rows={3} value={excerpt} onChange={(e) => setExcerpt(e.target.value)} maxLength={400} />
+            <textarea
+              rows={3}
+              value={excerpt}
+              onChange={(e) => setExcerpt(e.target.value)}
+              maxLength={400}
+            />
           </label>
           <label className="admin-field">
             <span>Body (Markdown supported)</span>
-            <textarea rows={18} value={body} onChange={(e) => setBody(e.target.value)} className="editor-body" />
+            <textarea
+              rows={18}
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              className="editor-body"
+            />
           </label>
 
           {preview && (
@@ -322,7 +369,8 @@ export function PostEditor({ postId, onSaved }: { postId?: string; onSaved?: (id
               />
             )}
             <p className="admin-hint">
-              We auto-generate {COVER_WIDTHS.length} sizes ({COVER_WIDTHS.join(", ")}px) for fast, responsive loading.
+              We auto-generate {COVER_WIDTHS.length} sizes ({COVER_WIDTHS.join(", ")}px) for fast,
+              responsive loading.
             </p>
             <input
               type="file"
@@ -335,13 +383,15 @@ export function PostEditor({ postId, onSaved }: { postId?: string; onSaved?: (id
               <button
                 type="button"
                 className="admin-link danger"
-                onClick={() => { setCoverImage(""); setCoverSrcset(null); }}
+                onClick={() => {
+                  setCoverImage("");
+                  setCoverSrcset(null);
+                }}
               >
                 Remove image
               </button>
             )}
           </div>
-
 
           <div className="admin-panel">
             <h3>Taxonomy</h3>
@@ -350,17 +400,27 @@ export function PostEditor({ postId, onSaved }: { postId?: string; onSaved?: (id
               <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
                 <option value="">— None —</option>
                 {categories.map((c) => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
                 ))}
               </select>
             </label>
             <label className="admin-field">
               <span>Tags (comma-separated)</span>
-              <input value={tags} onChange={(e) => setTags(e.target.value)} placeholder="steel, construction, abuja" />
+              <input
+                value={tags}
+                onChange={(e) => setTags(e.target.value)}
+                placeholder="steel, construction, abuja"
+              />
             </label>
             <label className="admin-field">
               <span>Author name (optional)</span>
-              <input value={authorName} onChange={(e) => setAuthorName(e.target.value)} maxLength={80} />
+              <input
+                value={authorName}
+                onChange={(e) => setAuthorName(e.target.value)}
+                maxLength={80}
+              />
             </label>
           </div>
 
@@ -368,11 +428,20 @@ export function PostEditor({ postId, onSaved }: { postId?: string; onSaved?: (id
             <h3>SEO</h3>
             <label className="admin-field">
               <span>SEO title (≤ 70 chars)</span>
-              <input value={seoTitle} onChange={(e) => setSeoTitle(e.target.value)} maxLength={70} />
+              <input
+                value={seoTitle}
+                onChange={(e) => setSeoTitle(e.target.value)}
+                maxLength={70}
+              />
             </label>
             <label className="admin-field">
               <span>SEO description (≤ 160 chars)</span>
-              <textarea rows={3} value={seoDescription} onChange={(e) => setSeoDescription(e.target.value)} maxLength={160} />
+              <textarea
+                rows={3}
+                value={seoDescription}
+                onChange={(e) => setSeoDescription(e.target.value)}
+                maxLength={160}
+              />
             </label>
           </div>
         </aside>

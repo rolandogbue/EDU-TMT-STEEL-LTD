@@ -13,7 +13,14 @@ import {
   FiBriefcase,
   FiEdit3,
 } from "react-icons/fi";
-import { GiSteelClaws, GiMetalBar, GiBrickWall, GiWoodBeam, GiMetalPlate, GiWireCoil } from "react-icons/gi";
+import {
+  GiSteelClaws,
+  GiMetalBar,
+  GiBrickWall,
+  GiWoodBeam,
+  GiMetalPlate,
+  GiWireCoil,
+} from "react-icons/gi";
 
 import tmtRods from "@/assets/products/tmt-rods.jpg";
 import brcMesh from "@/assets/products/brc-mesh.jpg";
@@ -135,25 +142,25 @@ export const AUDIENCES: Audience[] = [
     icon: FiTool,
     title: "Contractors & Site Managers",
     pain: "You can't afford site stoppages. Material shortages and quality failures cost you client relationships and project reputation.",
-    msg: "\"Never stall a site over materials again. We're stocked, we deliver same-day, and we answer at 3am.\"",
+    msg: '"Never stall a site over materials again. We\'re stocked, we deliver same-day, and we answer at 3am."',
   },
   {
     icon: FiBriefcase,
     title: "Real Estate Developers",
     pain: "Coordinating bulk procurement across multiple units, managing cost overruns, and maintaining consistent material quality is complex.",
-    msg: "\"Bulk orders. Fast delivery. Expert estimation. We're the supply partner serious developers build relationships with.\"",
+    msg: '"Bulk orders. Fast delivery. Expert estimation. We\'re the supply partner serious developers build relationships with."',
   },
   {
     icon: FiHome,
     title: "Self-Build Homeowners",
     pain: "You're making the biggest investment of your life. You don't know exactly what to buy, and you're afraid of being overcharged or undersupplied.",
-    msg: "\"Don't guess. Our estimation experts calculate exactly what your project needs. The consultation is free.\"",
+    msg: '"Don\'t guess. Our estimation experts calculate exactly what your project needs. The consultation is free."',
   },
   {
     icon: FiEdit3,
     title: "Architects & QS Professionals",
     pain: "The supplier you recommend reflects on your professional reputation. Underperforming vendors make you look bad to your clients.",
-    msg: "\"When you refer a client to EDU TMT, your reputation stays intact. We supply to spec, every time.\"",
+    msg: '"When you refer a client to EDU TMT, your reputation stays intact. We supply to spec, every time."',
   },
 ];
 

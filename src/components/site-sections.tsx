@@ -57,7 +57,9 @@ export function ProductsGrid() {
               <h3 className="product-name">{p.name}</h3>
               <div className="product-tag">{p.tag}</div>
               <p className="product-desc">{p.desc}</p>
-              <div className="product-num" aria-hidden>{String(i + 1).padStart(2, "0")}</div>
+              <div className="product-num" aria-hidden>
+                {String(i + 1).padStart(2, "0")}
+              </div>
             </div>
           </Reveal>
         );
@@ -79,7 +81,9 @@ export function ServicesGrid() {
             <h3 className="service-name">{s.name}</h3>
             <p className="service-desc">{s.desc}</p>
             <div className="service-detail">{s.detail}</div>
-            <div className="service-big-num" aria-hidden>{String(i + 1).padStart(2, "0")}</div>
+            <div className="service-big-num" aria-hidden>
+              {String(i + 1).padStart(2, "0")}
+            </div>
           </Reveal>
         );
       })}
@@ -116,7 +120,11 @@ export function WhySection() {
           <div className="why-content">
             <div className="section-label-light">Why Choose EDU TMT</div>
             <h2 id="why-title" className="section-title-light" style={{ marginTop: 16 }}>
-              The Reliable<br />Choice in<br /><em>Abuja.</em>
+              The Reliable
+              <br />
+              Choice in
+              <br />
+              <em>Abuja.</em>
             </h2>
             <div className="why-points">
               {WHY_POINTS.map((p, i) => (
@@ -135,7 +143,8 @@ export function WhySection() {
               <div className="why-visual-big">4.3%</div>
               <div className="why-visual-label">Nigeria's Construction Growth Rate 2025</div>
               <div className="why-visual-note">
-                Abuja leads Nigeria in government and institutional construction demand. EDU TMT is positioned at the centre of this growth.
+                Abuja leads Nigeria in government and institutional construction demand. EDU TMT is
+                positioned at the centre of this growth.
               </div>
             </div>
             <div className="why-supply">
@@ -160,17 +169,32 @@ export function ProofSection() {
   return (
     <section className="proof-section" aria-label="Our standard">
       <div className="proof-inner">
-        <div className="proof-quote-mark" aria-hidden>&ldquo;</div>
+        <div className="proof-quote-mark" aria-hidden>
+          &ldquo;
+        </div>
         <p className="proof-text">
-          In a market where material costs are volatile and project delays are expensive, reliability is not a feature — it's the product. EDU TMT delivers both.
+          In a market where material costs are volatile and project delays are expensive,
+          reliability is not a feature — it's the product. EDU TMT delivers both.
         </p>
         <div className="proof-divider" />
         <div className="proof-attribution">The Standard We Hold Ourselves To</div>
         <div className="proof-stats-row">
-          <div className="proof-stat-item"><div className="proof-stat-num">100%</div><div className="proof-stat-label">Quality Guaranteed</div></div>
-          <div className="proof-stat-item"><div className="proof-stat-num">24/7</div><div className="proof-stat-label">Always Reachable</div></div>
-          <div className="proof-stat-item"><div className="proof-stat-num">Same-Day</div><div className="proof-stat-label">Fast Delivery Dispatch</div></div>
-          <div className="proof-stat-item"><div className="proof-stat-num">6+</div><div className="proof-stat-label">Material Categories</div></div>
+          <div className="proof-stat-item">
+            <div className="proof-stat-num">100%</div>
+            <div className="proof-stat-label">Quality Guaranteed</div>
+          </div>
+          <div className="proof-stat-item">
+            <div className="proof-stat-num">24/7</div>
+            <div className="proof-stat-label">Always Reachable</div>
+          </div>
+          <div className="proof-stat-item">
+            <div className="proof-stat-num">Same-Day</div>
+            <div className="proof-stat-label">Fast Delivery Dispatch</div>
+          </div>
+          <div className="proof-stat-item">
+            <div className="proof-stat-num">6+</div>
+            <div className="proof-stat-label">Material Categories</div>
+          </div>
         </div>
       </div>
     </section>
@@ -183,7 +207,8 @@ export function CtaSection() {
       <div className="cta-inner">
         <div className="section-label-light">Ready to Build?</div>
         <h2 id="cta-title" className="cta-headline">
-          Let's Start<br />
+          Let's Start
+          <br />
           <span>Your Project.</span>
         </h2>
         <p className="cta-sub">Call us. WhatsApp us. Walk in. We're ready when you are.</p>
@@ -200,11 +225,15 @@ export function CtaSection() {
         <div className="cta-contacts">
           <div className="cta-contact-item">
             <span className="c-label">Phone</span>
-            <span className="c-value"><a href={CONTACT.phoneHref}>{CONTACT.phone}</a></span>
+            <span className="c-value">
+              <a href={CONTACT.phoneHref}>{CONTACT.phone}</a>
+            </span>
           </div>
           <div className="cta-contact-item">
             <span className="c-label">Email</span>
-            <span className="c-value"><a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a></span>
+            <span className="c-value">
+              <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>
+            </span>
           </div>
           <div className="cta-contact-item">
             <span className="c-label">Location</span>

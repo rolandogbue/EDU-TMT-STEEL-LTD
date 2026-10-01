@@ -5,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSiteSettings } from "@/lib/site-settings";
 import { changeRole, inviteMember, listTeam, removeRole } from "@/lib/team.functions";
 
-
 export const Route = createFileRoute("/_authenticated/admin/settings")({
   component: SettingsPage,
 });
@@ -20,7 +19,9 @@ function SettingsPage() {
   const [savingSite, setSavingSite] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [adminAccess, setAdminAccess] = useState<"checking" | "allowed" | "denied" | "error">("checking");
+  const [adminAccess, setAdminAccess] = useState<"checking" | "allowed" | "denied" | "error">(
+    "checking",
+  );
 
   const [email, setEmail] = useState("");
   const [newEmail, setNewEmail] = useState("");
@@ -57,7 +58,6 @@ function SettingsPage() {
     const { data } = await supabase.from("blog_categories").select("id,name,slug").order("name");
     setCategories((data ?? []) as Category[]);
   }, []);
-
 
   useEffect(() => {
     let active = true;
@@ -106,7 +106,9 @@ function SettingsPage() {
   }, [adminAccess, loadCategories, loadTeam]);
 
   const upload = useCallback(async (file: File, kind: "logo" | "favicon") => {
-    setError(null); setMsg(null); setUploading(kind);
+    setError(null);
+    setMsg(null);
+    setUploading(kind);
     try {
       const ext = file.name.split(".").pop() || "png";
       const path = `${kind}/${crypto.randomUUID()}.${ext}`;
@@ -125,7 +127,9 @@ function SettingsPage() {
   }, []);
 
   const saveSite = async () => {
-    setError(null); setMsg(null); setSavingSite(true);
+    setError(null);
+    setMsg(null);
+    setSavingSite(true);
     const { error } = await supabase
       .from("site_settings")
       .update({ logo_url: logoUrl, favicon_url: faviconUrl })
@@ -140,19 +144,30 @@ function SettingsPage() {
 
   const updateAccount = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null); setMsg(null); setUpdatingAccount(true);
+    setError(null);
+    setMsg(null);
+    setUpdatingAccount(true);
     const updates: { email?: string; password?: string } = {};
     if (newEmail && newEmail !== email) updates.email = newEmail.trim();
     if (newPassword) {
-      if (newPassword.length < 8) { setError("Password must be at least 8 characters"); setUpdatingAccount(false); return; }
+      if (newPassword.length < 8) {
+        setError("Password must be at least 8 characters");
+        setUpdatingAccount(false);
+        return;
+      }
       updates.password = newPassword;
     }
-    if (!Object.keys(updates).length) { setError("Nothing to update"); setUpdatingAccount(false); return; }
+    if (!Object.keys(updates).length) {
+      setError("Nothing to update");
+      setUpdatingAccount(false);
+      return;
+    }
     const { error } = await supabase.auth.updateUser(updates);
     if (error) setError(error.message);
     else {
       setMsg("Account updated. If you changed your email, check your inbox to confirm.");
-      setNewEmail(""); setNewPassword("");
+      setNewEmail("");
+      setNewPassword("");
       const { data } = await supabase.auth.getUser();
       setEmail(data.user?.email ?? "");
     }
@@ -162,7 +177,11 @@ function SettingsPage() {
   const addCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!catName.trim()) return;
-    const slug = catName.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+    const slug = catName
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
     await supabase.from("blog_categories").insert({ name: catName.trim(), slug });
     setCatName("");
     loadCategories();
@@ -176,7 +195,8 @@ function SettingsPage() {
 
   const submitInvite = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null); setMsg(null);
+    setError(null);
+    setMsg(null);
     if (!inviteEmail.trim()) return;
     setInviting(true);
     try {
@@ -187,10 +207,13 @@ function SettingsPage() {
           password: invitePassword.trim() || undefined,
         },
       });
-      setMsg(res.created
-        ? `Created ${inviteEmail} with role ${inviteRole}. Default password: ${invitePassword.trim() || "ChangeMe123!"} — share securely.`
-        : `Granted ${inviteRole} to ${inviteEmail}.`);
-      setInviteEmail(""); setInvitePassword("");
+      setMsg(
+        res.created
+          ? `Created ${inviteEmail} with role ${inviteRole}. Default password: ${invitePassword.trim() || "ChangeMe123!"} — share securely.`
+          : `Granted ${inviteRole} to ${inviteEmail}.`,
+      );
+      setInviteEmail("");
+      setInvitePassword("");
       await loadTeam();
     } catch (err) {
       if (import.meta.env.DEV) console.error("Could not update team access", err);
@@ -221,7 +244,6 @@ function SettingsPage() {
     }
   };
 
-
   if (adminAccess === "checking") {
     return <div className="admin-page">Checking access…</div>;
   }
@@ -244,11 +266,14 @@ function SettingsPage() {
     );
   }
 
-
   return (
     <div className="admin-page">
       <h1 className="admin-h1">Site settings</h1>
-      {error && <div className="admin-alert error" role="alert">{error}</div>}
+      {error && (
+        <div className="admin-alert error" role="alert">
+          {error}
+        </div>
+      )}
       {msg && <div className="admin-alert ok">{msg}</div>}
 
       <section className="admin-section">
@@ -256,9 +281,15 @@ function SettingsPage() {
         <div className="branding-grid">
           <div className="admin-panel">
             <h3>Custom logo</h3>
-            <p className="admin-hint">Displayed in the site header. Square PNG or SVG recommended.</p>
+            <p className="admin-hint">
+              Displayed in the site header. Square PNG or SVG recommended.
+            </p>
             <div className="brand-preview">
-              {logoUrl ? <img src={logoUrl} alt="Logo preview" /> : <div className="brand-empty">No custom logo</div>}
+              {logoUrl ? (
+                <img src={logoUrl} alt="Logo preview" />
+              ) : (
+                <div className="brand-empty">No custom logo</div>
+              )}
             </div>
             <input
               type="file"
@@ -266,14 +297,22 @@ function SettingsPage() {
               disabled={uploading === "logo"}
               onChange={(e) => e.target.files?.[0] && upload(e.target.files[0], "logo")}
             />
-            {logoUrl && <button className="admin-link danger" onClick={() => setLogoUrl(null)}>Reset to default</button>}
+            {logoUrl && (
+              <button className="admin-link danger" onClick={() => setLogoUrl(null)}>
+                Reset to default
+              </button>
+            )}
           </div>
 
           <div className="admin-panel">
             <h3>Favicon</h3>
             <p className="admin-hint">Shown in the browser tab. 32x32 or 64x64 PNG works best.</p>
             <div className="brand-preview small">
-              {faviconUrl ? <img src={faviconUrl} alt="Favicon preview" /> : <div className="brand-empty">Default favicon</div>}
+              {faviconUrl ? (
+                <img src={faviconUrl} alt="Favicon preview" />
+              ) : (
+                <div className="brand-empty">Default favicon</div>
+              )}
             </div>
             <input
               type="file"
@@ -281,7 +320,11 @@ function SettingsPage() {
               disabled={uploading === "favicon"}
               onChange={(e) => e.target.files?.[0] && upload(e.target.files[0], "favicon")}
             />
-            {faviconUrl && <button className="admin-link danger" onClick={() => setFaviconUrl(null)}>Reset to default</button>}
+            {faviconUrl && (
+              <button className="admin-link danger" onClick={() => setFaviconUrl(null)}>
+                Reset to default
+              </button>
+            )}
           </div>
         </div>
         <button className="btn-large" onClick={saveSite} disabled={savingSite}>
@@ -292,14 +335,22 @@ function SettingsPage() {
       <section className="admin-section">
         <h2 className="admin-h2">Blog categories</h2>
         <form onSubmit={addCategory} className="admin-inline-form">
-          <input placeholder="New category name" value={catName} onChange={(e) => setCatName(e.target.value)} />
-          <button type="submit" className="btn-outline">Add</button>
+          <input
+            placeholder="New category name"
+            value={catName}
+            onChange={(e) => setCatName(e.target.value)}
+          />
+          <button type="submit" className="btn-outline">
+            Add
+          </button>
         </form>
         <ul className="admin-inline-list">
           {categories.map((c) => (
             <li key={c.id}>
               <span>{c.name}</span>
-              <button className="admin-link danger" onClick={() => deleteCategory(c.id)}>Delete</button>
+              <button className="admin-link danger" onClick={() => deleteCategory(c.id)}>
+                Delete
+              </button>
             </li>
           ))}
           {!categories.length && <li className="muted">No categories yet.</li>}
@@ -308,15 +359,29 @@ function SettingsPage() {
 
       <section className="admin-section">
         <h2 className="admin-h2">Admin account</h2>
-        <p className="admin-hint">Current email: <strong>{email}</strong></p>
+        <p className="admin-hint">
+          Current email: <strong>{email}</strong>
+        </p>
         <form onSubmit={updateAccount} className="admin-form">
           <label className="admin-field">
             <span>New email (leave blank to keep)</span>
-            <input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} maxLength={255} />
+            <input
+              type="email"
+              value={newEmail}
+              onChange={(e) => setNewEmail(e.target.value)}
+              maxLength={255}
+            />
           </label>
           <label className="admin-field">
             <span>New password (leave blank to keep)</span>
-            <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} minLength={8} maxLength={72} autoComplete="new-password" />
+            <input
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              minLength={8}
+              maxLength={72}
+              autoComplete="new-password"
+            />
           </label>
           <button type="submit" className="btn-large" disabled={updatingAccount}>
             {updatingAccount ? "Updating…" : "Update login details"}
@@ -327,7 +392,8 @@ function SettingsPage() {
       <section className="admin-section">
         <h2 className="admin-h2">Team &amp; roles</h2>
         <p className="admin-hint">
-          Admins can manage everything. Content managers can create and edit blog posts, categories and tags — but cannot change site settings or team.
+          Admins can manage everything. Content managers can create and edit blog posts, categories
+          and tags — but cannot change site settings or team.
         </p>
         {teamError && (
           <div className="admin-alert error" role="alert">
@@ -335,7 +401,6 @@ function SettingsPage() {
           </div>
         )}
         <form onSubmit={submitInvite} className="admin-form">
-
           <label className="admin-field">
             <span>Email</span>
             <input
@@ -349,7 +414,10 @@ function SettingsPage() {
           </label>
           <label className="admin-field">
             <span>Role</span>
-            <select value={inviteRole} onChange={(e) => setInviteRole(e.target.value as "admin" | "content_manager")}>
+            <select
+              value={inviteRole}
+              onChange={(e) => setInviteRole(e.target.value as "admin" | "content_manager")}
+            >
               <option value="content_manager">Content manager</option>
               <option value="admin">Admin</option>
             </select>
@@ -379,12 +447,18 @@ function SettingsPage() {
               </span>
               <span style={{ display: "flex", gap: ".5rem" }}>
                 {row.role === "content_manager" && (
-                  <button className="admin-link" onClick={() => promote(row, "admin")}>Make admin</button>
+                  <button className="admin-link" onClick={() => promote(row, "admin")}>
+                    Make admin
+                  </button>
                 )}
                 {row.role === "admin" && (
-                  <button className="admin-link" onClick={() => promote(row, "content_manager")}>Add content manager</button>
+                  <button className="admin-link" onClick={() => promote(row, "content_manager")}>
+                    Add content manager
+                  </button>
                 )}
-                <button className="admin-link danger" onClick={() => revoke(row)}>Revoke</button>
+                <button className="admin-link danger" onClick={() => revoke(row)}>
+                  Revoke
+                </button>
               </span>
             </li>
           ))}
@@ -392,5 +466,4 @@ function SettingsPage() {
       </section>
     </div>
   );
-
 }

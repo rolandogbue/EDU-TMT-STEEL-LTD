@@ -37,7 +37,13 @@ function AdminLayout() {
           return;
         }
         const list = (roles ?? []).map((r) => r.role as Role);
-        setRole(list.includes("admin") ? "admin" : list.includes("content_manager") ? "content_manager" : "none");
+        setRole(
+          list.includes("admin")
+            ? "admin"
+            : list.includes("content_manager")
+              ? "content_manager"
+              : "none",
+        );
       } catch (error) {
         if (import.meta.env.DEV) console.error("Could not verify admin access", error);
         setRole("error");
@@ -59,8 +65,12 @@ function AdminLayout() {
       <div className="admin-shell">
         <div className="admin-forbidden">
           <h1>Not authorised</h1>
-          <p>Your account <strong>{user?.email}</strong> does not have admin access.</p>
-          <button className="btn-outline" onClick={signOut}>Sign out</button>
+          <p>
+            Your account <strong>{user?.email}</strong> does not have admin access.
+          </p>
+          <button className="btn-outline" onClick={signOut}>
+            Sign out
+          </button>
         </div>
       </div>
     );
@@ -72,7 +82,9 @@ function AdminLayout() {
         <div className="admin-forbidden">
           <h1>Unable to verify access</h1>
           <p>Please refresh the page. If the problem continues, contact support.</p>
-          <button className="btn-outline" onClick={signOut}>Sign out</button>
+          <button className="btn-outline" onClick={signOut}>
+            Sign out
+          </button>
         </div>
       </div>
     );
@@ -85,17 +97,25 @@ function AdminLayout() {
       <aside className="admin-sidebar" aria-label="Admin navigation">
         <div className="admin-brand">EDU Admin</div>
         <nav>
-          <Link to="/admin" activeOptions={{ exact: true }} activeProps={{ className: "active" }}>Dashboard</Link>
-          <Link to="/admin/blog" activeProps={{ className: "active" }}>Blog</Link>
+          <Link to="/admin" activeOptions={{ exact: true }} activeProps={{ className: "active" }}>
+            Dashboard
+          </Link>
+          <Link to="/admin/blog" activeProps={{ className: "active" }}>
+            Blog
+          </Link>
           {isAdmin && (
-            <Link to="/admin/settings" activeProps={{ className: "active" }}>Site Settings</Link>
+            <Link to="/admin/settings" activeProps={{ className: "active" }}>
+              Site Settings
+            </Link>
           )}
           <Link to="/">← View site</Link>
         </nav>
         <div className="admin-user">
           <div className="admin-user-email">{user?.email}</div>
           <div className="admin-user-role">{role.replace("_", " ")}</div>
-          <button className="admin-signout" onClick={signOut}>Sign out</button>
+          <button className="admin-signout" onClick={signOut}>
+            Sign out
+          </button>
         </div>
       </aside>
       <main className="admin-main">

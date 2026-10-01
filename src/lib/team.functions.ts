@@ -58,13 +58,17 @@ export const inviteMember = createServerFn({ method: "POST" })
         password: data.password ?? "ChangeMe123!",
         email_confirm: true,
       });
-      if (createErr || !created.user) throw new Error(createErr?.message ?? "Failed to create user");
+      if (createErr || !created.user)
+        throw new Error(createErr?.message ?? "Failed to create user");
       userId = created.user.id;
     }
 
     const { error: roleErr } = await supabaseAdmin
       .from("user_roles")
-      .upsert({ user_id: userId, role: data.role }, { onConflict: "user_id,role", ignoreDuplicates: true });
+      .upsert(
+        { user_id: userId, role: data.role },
+        { onConflict: "user_id,role", ignoreDuplicates: true },
+      );
     if (roleErr) throw new Error(roleErr.message);
 
     return { ok: true, user_id: userId, created: !found };
@@ -95,7 +99,10 @@ export const changeRole = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin
       .from("user_roles")
-      .upsert({ user_id: data.user_id, role: data.role }, { onConflict: "user_id,role", ignoreDuplicates: true });
+      .upsert(
+        { user_id: data.user_id, role: data.role },
+        { onConflict: "user_id,role", ignoreDuplicates: true },
+      );
     if (error) throw new Error(error.message);
     return { ok: true };
   });

@@ -19,7 +19,10 @@ export async function assertAdmin(context: AuthedContext) {
 
   const { data, error } = await (
     context.supabase as {
-      rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }>;
+      rpc: (
+        fn: string,
+        args: Record<string, unknown>,
+      ) => Promise<{ data: unknown; error: { message: string } | null }>;
     }
   ).rpc("has_role", { _user_id: context.userId, _role: "admin" });
 
