@@ -16,6 +16,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { ScrollToTop } from "@/components/scroll-to-top";
 import { SiteSettingsProvider } from "@/lib/site-settings";
 import { AuthProvider } from "@/lib/auth-hooks";
+import { Analytics } from "@vercel/analytics/react";
 
 function NotFoundComponent() {
   return (
@@ -157,6 +158,7 @@ function RootShell({ children }: { children: ReactNode }) {
       </head>
       <body>
         {children}
+        <Analytics />
         <Scripts />
       </body>
     </html>
