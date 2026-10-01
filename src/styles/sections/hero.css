@@ -10,130 +10,212 @@
   padding: 120px 60px 80px;
 }
 .hero-grid {
-  position: absolute; inset: 0;
+  position: absolute;
+  inset: 0;
   background-image:
     linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
   background-size: 80px 80px;
 }
 .hero-slash {
-  position: absolute; top: 0; right: 0;
-  width: 55%; height: 100%;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 55%;
+  height: 100%;
   background: linear-gradient(135deg, transparent 40%, rgba(232, 88, 11, 0.06) 100%);
   border-left: 1px solid rgba(232, 88, 11, 0.15);
   clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%);
 }
 .hero-orb {
-  position: absolute; top: 20%; right: 15%;
-  width: 500px; height: 500px;
+  position: absolute;
+  top: 20%;
+  right: 15%;
+  width: 500px;
+  height: 500px;
   background: radial-gradient(circle, rgba(232, 88, 11, 0.12) 0%, transparent 65%);
   border-radius: 50%;
   animation: pulse 4s ease-in-out infinite;
 }
 @keyframes pulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.08); opacity: 0.7; }
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.7;
+  }
 }
 .hero-content {
-  position: relative; z-index: 2;
-  max-width: 1100px; width: 100%; margin: 0 auto;
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 80px; align-items: center;
+  position: relative;
+  z-index: 2;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
 }
-.hero-left { animation: fadeUp 0.8s ease both; }
+.hero-left {
+  animation: fadeUp 0.8s ease both;
+}
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(40px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .hero-eyebrow {
-  display: inline-flex; align-items: center; gap: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   margin-bottom: 32px;
   animation: fadeUp 0.8s 0.1s ease both;
 }
-.hero-eyebrow-line { width: 40px; height: 1px; background: var(--orange); }
+.hero-eyebrow-line {
+  width: 40px;
+  height: 1px;
+  background: var(--orange);
+}
 .hero-eyebrow-text {
-  font-size: 11px; font-weight: 600; letter-spacing: 4px;
-  text-transform: uppercase; color: var(--orange);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--orange);
 }
 .hero-headline {
   font-family: var(--font-display);
   font-size: clamp(56px, 8vw, 108px);
-  font-weight: 900; line-height: 0.9;
-  color: var(--white); letter-spacing: -1px;
+  font-weight: 900;
+  line-height: 0.9;
+  color: var(--white);
+  letter-spacing: -1px;
   text-transform: uppercase;
   margin: 0 0 32px;
   animation: fadeUp 0.8s 0.2s ease both;
 }
-.hero-headline .line-orange { color: var(--orange); display: block; }
+.hero-headline .line-orange {
+  color: var(--orange);
+  display: block;
+}
 .hero-headline .line-stroke {
   -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3);
-  color: transparent; display: block;
+  color: transparent;
+  display: block;
 }
 .hero-subhead {
   font-family: var(--font-serif);
-  font-size: 18px; color: rgba(255, 255, 255, 0.55);
-  line-height: 1.7; max-width: 460px;
-  margin-bottom: 48px; font-style: italic;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.7;
+  max-width: 460px;
+  margin-bottom: 48px;
+  font-style: italic;
   animation: fadeUp 0.8s 0.3s ease both;
 }
 .hero-actions {
-  display: flex; gap: 16px; align-items: center;
+  display: flex;
+  gap: 16px;
+  align-items: center;
   animation: fadeUp 0.8s 0.4s ease both;
   flex-wrap: wrap;
 }
-.hero-right { animation: fadeUp 0.8s 0.5s ease both; }
+.hero-right {
+  animation: fadeUp 0.8s 0.5s ease both;
+}
 .hero-stats {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
 }
 .hero-stat {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.07);
   padding: 36px 32px;
-  position: relative; overflow: hidden;
+  position: relative;
+  overflow: hidden;
   transition: background 0.3s;
 }
-.hero-stat:hover { background: rgba(232, 88, 11, 0.08); }
-.hero-stat::before {
-  content: ''; position: absolute;
-  top: 0; left: 0; width: 3px; height: 0;
-  background: var(--orange); transition: height 0.3s ease;
+.hero-stat:hover {
+  background: rgba(232, 88, 11, 0.08);
 }
-.hero-stat:hover::before { height: 100%; }
+.hero-stat::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 0;
+  background: var(--orange);
+  transition: height 0.3s ease;
+}
+.hero-stat:hover::before {
+  height: 100%;
+}
 .hero-stat-num {
   font-family: var(--font-display);
-  font-size: 56px; font-weight: 900;
-  color: var(--orange); line-height: 1;
+  font-size: 56px;
+  font-weight: 900;
+  color: var(--orange);
+  line-height: 1;
   margin-bottom: 4px;
 }
 .hero-stat-label {
-  font-size: 12px; font-weight: 500;
+  font-size: 12px;
+  font-weight: 500;
   color: rgba(255, 255, 255, 0.45);
-  letter-spacing: 1px; line-height: 1.4;
+  letter-spacing: 1px;
+  line-height: 1.4;
   text-transform: uppercase;
 }
 .hero-ticker {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  background: var(--orange); height: 44px;
-  display: flex; align-items: center; overflow: hidden;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--orange);
+  height: 44px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
 }
 .ticker-track {
-  display: flex; gap: 0;
+  display: flex;
+  gap: 0;
   animation: ticker 30s linear infinite;
   white-space: nowrap;
 }
 @keyframes ticker {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 .ticker-item {
   font-family: var(--font-display);
-  font-size: 13px; font-weight: 700; letter-spacing: 3px;
-  text-transform: uppercase; color: var(--white);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--white);
   padding: 0 40px;
-  display: flex; align-items: center; gap: 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
 .ticker-dot {
-  width: 4px; height: 4px;
+  width: 4px;
+  height: 4px;
   background: rgba(255, 255, 255, 0.5);
   border-radius: 50%;
 }

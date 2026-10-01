@@ -2,50 +2,85 @@
 
 .audience-section {
   padding: 120px 60px;
-  max-width: 1200px; margin: 0 auto;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 .audience-title-main {
   font-family: var(--font-display);
   font-size: clamp(36px, 4.5vw, 60px);
-  font-weight: 800; text-transform: uppercase;
-  line-height: 0.95; color: var(--ink); margin: 0;
+  font-weight: 800;
+  text-transform: uppercase;
+  line-height: 0.95;
+  color: var(--ink);
+  margin: 0;
 }
-.audience-title-main span { color: var(--orange); }
+.audience-title-main span {
+  color: var(--orange);
+}
 .audience-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr);
-  gap: 2px; margin-top: 64px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  margin-top: 64px;
 }
 .audience-card {
-  background: var(--white); padding: 44px 36px;
+  background: var(--white);
+  padding: 44px 36px;
   border: 1px solid var(--smoke);
-  transition: background 0.3s, transform 0.3s;
-  position: relative; overflow: hidden;
+  transition:
+    background 0.3s,
+    transform 0.3s;
+  position: relative;
+  overflow: hidden;
 }
 .audience-card:hover {
-  background: var(--ink); transform: translateY(-8px);
+  background: var(--ink);
+  transform: translateY(-8px);
 }
-.audience-card:hover .audience-title { color: var(--white); }
-.audience-card:hover .audience-pain { color: rgba(255, 255, 255, 0.5); }
-.audience-card:hover .audience-msg { color: var(--orange); }
-.audience-emoji { font-size: 36px; margin-bottom: 24px; display: block; }
+.audience-card:hover .audience-title {
+  color: var(--white);
+}
+.audience-card:hover .audience-pain {
+  color: rgba(255, 255, 255, 0.5);
+}
+.audience-card:hover .audience-msg {
+  color: var(--orange);
+}
+.audience-emoji {
+  font-size: 36px;
+  margin-bottom: 24px;
+  display: block;
+}
 .audience-title {
   font-family: var(--font-display);
-  font-size: 20px; font-weight: 800;
-  text-transform: uppercase; color: var(--ink);
-  letter-spacing: 1px; margin-bottom: 16px;
-  line-height: 1.1; transition: color 0.3s;
+  font-size: 20px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--ink);
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+  line-height: 1.1;
+  transition: color 0.3s;
 }
 .audience-pain {
-  font-size: 13px; color: var(--mid);
-  line-height: 1.7; margin-bottom: 20px;
-  font-weight: 300; transition: color 0.3s;
+  font-size: 13px;
+  color: var(--mid);
+  line-height: 1.7;
+  margin-bottom: 20px;
+  font-weight: 300;
+  transition: color 0.3s;
 }
 .audience-divider {
-  width: 32px; height: 2px;
-  background: var(--orange); margin-bottom: 20px;
+  width: 32px;
+  height: 2px;
+  background: var(--orange);
+  margin-bottom: 20px;
 }
 .audience-msg {
   font-family: var(--font-serif);
-  font-size: 14px; font-style: italic;
-  color: var(--iron); line-height: 1.6; transition: color 0.3s;
+  font-size: 14px;
+  font-style: italic;
+  color: var(--iron);
+  line-height: 1.6;
+  transition: color 0.3s;
 }

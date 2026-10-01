@@ -1,15 +1,26 @@
 /* Shared icon tinting (react-icons svgs inside section chrome) */
 
-.service-icon-wrap svg { color: var(--orange); }
+.service-icon-wrap svg {
+  color: var(--orange);
+}
 .trust-icon {
-  display: inline-flex; align-items: center; justify-content: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: var(--orange);
 }
 .audience-emoji {
-  display: inline-flex; align-items: center; justify-content: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: var(--orange);
 }
 .social-btn {
-  display: inline-flex; align-items: center; justify-content: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
-.social-btn svg { width: 14px; height: 14px; }
+.social-btn svg {
+  width: 14px;
+  height: 14px;
+}

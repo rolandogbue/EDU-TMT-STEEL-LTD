@@ -54,15 +54,15 @@ publishing blog content and managing site branding.
 
 ### Runtime
 
-| Layer     | Technology                                                        |
-|-----------|-------------------------------------------------------------------|
-| Framework | TanStack Start v1 (React 19, file-based routing, SSR)             |
-| Build     | Vite 8 with `@tailwindcss/vite` and Nitro                        |
-| Styling   | Tailwind CSS v4 (CSS-first `@theme`) + shadcn/ui                  |
-| Icons     | `react-icons`, `lucide-react`                                     |
-| Data      | TanStack Query v5 (route-loader primed cache)                     |
-| Backend   | Supabase (Postgres, Auth, Storage)                                |
-| Hosting   | Vercel (TanStack Start server output built by Nitro)              |
+| Layer     | Technology                                            |
+| --------- | ----------------------------------------------------- |
+| Framework | TanStack Start v1 (React 19, file-based routing, SSR) |
+| Build     | Vite 8 with `@tailwindcss/vite` and Nitro             |
+| Styling   | Tailwind CSS v4 (CSS-first `@theme`) + shadcn/ui      |
+| Icons     | `react-icons`, `lucide-react`                         |
+| Data      | TanStack Query v5 (route-loader primed cache)         |
+| Backend   | Supabase (Postgres, Auth, Storage)                    |
+| Hosting   | Vercel (TanStack Start server output built by Nitro)  |
 
 ### High-level architecture
 
@@ -90,22 +90,22 @@ explicit `GRANT`s for `anon` / `authenticated` / `service_role`.
 
 Singleton row (`id = 1`).
 
-| Column        | Type    | Notes                                       |
-|---------------|---------|---------------------------------------------|
-| `id`          | int     | Always `1`.                                  |
-| `logo_url`    | text    | Public URL of logo in `site-assets` bucket.  |
-| `favicon_url` | text    | Public URL of favicon.                       |
-| `admin_email` | text    | Email that receives the `admin` role on signup. |
-| `updated_at`  | tstz    | Auto-maintained.                             |
+| Column        | Type | Notes                                           |
+| ------------- | ---- | ----------------------------------------------- |
+| `id`          | int  | Always `1`.                                     |
+| `logo_url`    | text | Public URL of logo in `site-assets` bucket.     |
+| `favicon_url` | text | Public URL of favicon.                          |
+| `admin_email` | text | Email that receives the `admin` role on signup. |
+| `updated_at`  | tstz | Auto-maintained.                                |
 
 **Policies.** Anyone can read; only admins can update.
 
 ### `user_roles` — role assignments
 
-| Column | Type       | Notes                                    |
-|--------|------------|------------------------------------------|
-| `user_id` | uuid    | FK to `auth.users` (managed).            |
-| `role`    | enum    | `app_role` — currently `admin` only.     |
+| Column    | Type | Notes                                |
+| --------- | ---- | ------------------------------------ |
+| `user_id` | uuid | FK to `auth.users` (managed).        |
+| `role`    | enum | `app_role` — currently `admin` only. |
 
 Roles are checked via `public.has_role(uuid, app_role)` (SECURITY DEFINER,
 stable). Never store roles on the profile table.
@@ -117,22 +117,23 @@ Standard taxonomy tables. `blog_post_tags` is a many-to-many link with
 
 ### `blog_posts` — CMS content
 
-| Column            | Type       | Notes                                    |
-|-------------------|------------|------------------------------------------|
-| `title`           | text       | Required.                                |
-| `slug`            | text       | Unique in publishing surface.            |
-| `excerpt`         | text       | Shown in listings.                       |
-| `body`            | text       | Markdown source (rendered with `react-markdown` + GFM). |
-| `cover_image`     | text       | Public URL in `site-assets`.             |
-| `status`          | enum       | `draft` / `published` / `scheduled`.     |
-| `published_at`    | tstz       | Publish or scheduled-publish time.       |
-| `author_id`       | uuid       | `auth.users.id`.                         |
-| `author_name`     | text       | Display name snapshot.                   |
-| `category_id`     | uuid       | FK to `blog_categories`.                 |
-| `seo_title`       | text       | Overrides `<title>` on the post page.    |
-| `seo_description` | text       | Overrides meta description.              |
+| Column            | Type | Notes                                                   |
+| ----------------- | ---- | ------------------------------------------------------- |
+| `title`           | text | Required.                                               |
+| `slug`            | text | Unique in publishing surface.                           |
+| `excerpt`         | text | Shown in listings.                                      |
+| `body`            | text | Markdown source (rendered with `react-markdown` + GFM). |
+| `cover_image`     | text | Public URL in `site-assets`.                            |
+| `status`          | enum | `draft` / `published` / `scheduled`.                    |
+| `published_at`    | tstz | Publish or scheduled-publish time.                      |
+| `author_id`       | uuid | `auth.users.id`.                                        |
+| `author_name`     | text | Display name snapshot.                                  |
+| `category_id`     | uuid | FK to `blog_categories`.                                |
+| `seo_title`       | text | Overrides `<title>` on the post page.                   |
+| `seo_description` | text | Overrides meta description.                             |
 
 **Policies.**
+
 - `anon` + `authenticated`: read rows where `status='published'` AND
   `published_at <= now()`.
 - `admin`: full read + write.
@@ -186,14 +187,14 @@ the reviewed Supabase migration workflow described in
 Copy `.env.example` to `.env` for local development. In Vercel, set the same
 values through Project Settings → Environment Variables.
 
-| Variable                        | Scope   | Purpose                                    |
-|---------------------------------|---------|--------------------------------------------|
-| `VITE_SUPABASE_URL`             | Client  | Supabase project URL.                      |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | Client  | Anon/publishable API key.                  |
-| `SUPABASE_URL`                  | Server  | SSR-time Supabase URL.                     |
-| `SUPABASE_PUBLISHABLE_KEY`      | Server  | SSR-time publishable key.                  |
-| `SUPABASE_SECRET_KEY`           | Server  | Privileged operations only.                |
-| `SUPABASE_SERVICE_ROLE_KEY`     | Server  | Legacy name for the secret key.            |
+| Variable                        | Scope  | Purpose                         |
+| ------------------------------- | ------ | ------------------------------- |
+| `VITE_SUPABASE_URL`             | Client | Supabase project URL.           |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Client | Anon/publishable API key.       |
+| `SUPABASE_URL`                  | Server | SSR-time Supabase URL.          |
+| `SUPABASE_PUBLISHABLE_KEY`      | Server | SSR-time publishable key.       |
+| `SUPABASE_SECRET_KEY`           | Server | Privileged operations only.     |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Server | Legacy name for the secret key. |
 
 Never expose service-role keys to the browser. Read `process.env.*` inside
 server-function handlers only, never at module scope.
@@ -248,20 +249,20 @@ protected). Server functions are reserved for privileged/auth-guarded work.
 
 ### Public reads (browser client)
 
-| Purpose                | Table              | Filter                                    |
-|------------------------|--------------------|-------------------------------------------|
-| Blog listing           | `blog_posts`       | `status='published' AND published_at<=now()` |
-| Blog detail            | `blog_posts`       | `slug=? AND status='published'`           |
-| Site branding          | `site_settings`    | `id=1`                                    |
+| Purpose       | Table           | Filter                                       |
+| ------------- | --------------- | -------------------------------------------- |
+| Blog listing  | `blog_posts`    | `status='published' AND published_at<=now()` |
+| Blog detail   | `blog_posts`    | `slug=? AND status='published'`              |
+| Site branding | `site_settings` | `id=1`                                       |
 
 ### Admin writes (RLS as `admin` role)
 
-| Purpose             | Surface                                                        |
-|---------------------|----------------------------------------------------------------|
-| Create/edit post    | `src/components/admin/post-editor.tsx` → `blog_posts` upsert    |
-| Delete post         | `src/routes/_authenticated/admin/blog/index.tsx`                |
-| Update branding     | `src/routes/_authenticated/admin/settings.tsx` → `site_settings`|
-| Upload asset        | Supabase Storage `site-assets` (via `storage.from(...).upload`) |
+| Purpose          | Surface                                                          |
+| ---------------- | ---------------------------------------------------------------- |
+| Create/edit post | `src/components/admin/post-editor.tsx` → `blog_posts` upsert     |
+| Delete post      | `src/routes/_authenticated/admin/blog/index.tsx`                 |
+| Update branding  | `src/routes/_authenticated/admin/settings.tsx` → `site_settings` |
+| Upload asset     | Supabase Storage `site-assets` (via `storage.from(...).upload`)  |
 
 ### HTTP endpoints
 
@@ -274,15 +275,15 @@ protected). Server functions are reserved for privileged/auth-guarded work.
 
 Roles are stored in `public.user_roles` and checked with `has_role()`.
 
-| Feature                             | Anonymous | Authenticated (no role) | Admin |
-|-------------------------------------|:---------:|:-----------------------:|:-----:|
-| View public pages (`/`, `/about`, `/services`, `/products`, `/contact`) | ✔ | ✔ | ✔ |
-| View blog listing & published posts | ✔         | ✔                       | ✔     |
-| View draft/scheduled posts          | ✖         | ✖                       | ✔     |
-| Access `/admin/*`                   | ✖         | ✖                       | ✔     |
-| Create / edit / delete posts        | ✖         | ✖                       | ✔     |
-| Update site branding / favicon      | ✖         | ✖                       | ✔     |
-| Read `site_settings`                | ✔         | ✔                       | ✔     |
+| Feature                                                                 | Anonymous | Authenticated (no role) | Admin |
+| ----------------------------------------------------------------------- | :-------: | :---------------------: | :---: |
+| View public pages (`/`, `/about`, `/services`, `/products`, `/contact`) |     ✔     |            ✔            |   ✔   |
+| View blog listing & published posts                                     |     ✔     |            ✔            |   ✔   |
+| View draft/scheduled posts                                              |     ✖     |            ✖            |   ✔   |
+| Access `/admin/*`                                                       |     ✖     |            ✖            |   ✔   |
+| Create / edit / delete posts                                            |     ✖     |            ✖            |   ✔   |
+| Update site branding / favicon                                          |     ✖     |            ✖            |   ✔   |
+| Read `site_settings`                                                    |     ✔     |            ✔            |   ✔   |
 
 **Admin bootstrapping.** The `grant_admin_on_signup` trigger grants the
 `admin` role to any new signup whose email matches
@@ -400,13 +401,13 @@ admin on next signup.
 
 ## 13. Troubleshooting & Known Issues
 
-| Symptom                                     | Cause / Fix                                                    |
-|---------------------------------------------|-----------------------------------------------------------------|
-| "Unauthorized" on `/admin` after signup     | Email doesn't match `site_settings.admin_email`. Update it and re-signup, or manually insert into `user_roles`. |
-| Logo not updating after upload              | Hard-refresh the browser; the settings provider re-fetches on mount. |
-| Scheduled post never publishes              | `publish_scheduled_posts()` cron not configured — schedule it. |
-| Blog page shows "No posts on this page"     | `?page=N` past the last page. Click "Back to page 1".          |
-| Build fails with `Expected 3 parts in JWT`  | A server-side read is using the service-role key against a JWT-expecting endpoint. Switch to the publishable key + RLS. |
+| Symptom                                    | Cause / Fix                                                                                                             |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| "Unauthorized" on `/admin` after signup    | Email doesn't match `site_settings.admin_email`. Update it and re-signup, or manually insert into `user_roles`.         |
+| Logo not updating after upload             | Hard-refresh the browser; the settings provider re-fetches on mount.                                                    |
+| Scheduled post never publishes             | `publish_scheduled_posts()` cron not configured — schedule it.                                                          |
+| Blog page shows "No posts on this page"    | `?page=N` past the last page. Click "Back to page 1".                                                                   |
+| Build fails with `Expected 3 parts in JWT` | A server-side read is using the service-role key against a JWT-expecting endpoint. Switch to the publishable key + RLS. |
 
 **Known limitations.**
 
@@ -419,16 +420,19 @@ admin on next signup.
 ## 14. Change Log
 
 ### v0.3.0 — Blog pagination + docs
+
 - Server-paginated `/blog` listing (9 per page, numbered pager).
 - Added this documentation set (`docs/`).
 
 ### v0.2.0 — CMS & admin
+
 - Supabase backend; `blog_posts`, `blog_categories`, `blog_tags`,
   `site_settings`, `user_roles` schemas.
 - Admin dashboard, post editor with Markdown + cover upload, settings page.
 - Dynamic logo/favicon.
 
 ### v0.1.0 — Marketing site
+
 - Home, About, Services, Products, Contact routes.
 - React-icons, real product photos, scroll animations, scroll-to-top.
 - Sitemap, robots.
@@ -487,4 +491,4 @@ admin on next signup.
 
 ---
 
-*Last updated: 2026-07-05.*
+_Last updated: 2026-07-05._

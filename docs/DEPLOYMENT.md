@@ -37,7 +37,7 @@ Configure the following variables for Preview and Production environments:
 | `SUPABASE_URL`                  | Server runtime           | Supabase project URL used during SSR          |
 | `SUPABASE_PUBLISHABLE_KEY`      | Server runtime           | Public key used for server-side user requests |
 | `SUPABASE_SECRET_KEY`           | Server runtime, optional | Restricted admin bootstrap/team operations    |
-| `SUPABASE_SERVICE_ROLE_KEY`     | Server runtime, legacy   | Legacy name for the server secret key          |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Server runtime, legacy   | Legacy name for the server secret key         |
 
 The service-role key bypasses RLS. Add it only as a Vercel server environment
 variable; never name it with a `VITE_` prefix and never commit it to GitHub.

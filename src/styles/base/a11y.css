@@ -1,22 +1,46 @@
 /* Accessibility helpers: sr-only, skip link, focus rings */
 
 .sr-only {
-  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 .skip-link {
-  position: absolute; top: -40px; left: 8px; z-index: 2000;
-  background: var(--orange); color: var(--white);
-  padding: 10px 16px; font-family: var(--font-display); font-weight: 700;
-  letter-spacing: 1.5px; text-transform: uppercase; text-decoration: none;
+  position: absolute;
+  top: -40px;
+  left: 8px;
+  z-index: 2000;
+  background: var(--orange);
+  color: var(--white);
+  padding: 10px 16px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-decoration: none;
   transition: top 0.2s;
 }
-.skip-link:focus { top: 8px; outline: 3px solid var(--white); outline-offset: 2px; }
-main:focus { outline: none; }
+.skip-link:focus {
+  top: 8px;
+  outline: 3px solid var(--white);
+  outline-offset: 2px;
+}
+main:focus {
+  outline: none;
+}
 
 /* Global focus-visible ring for interactive elements */
-a:focus-visible, button:focus-visible, input:focus-visible,
-select:focus-visible, textarea:focus-visible {
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
   outline: 3px solid var(--orange);
   outline-offset: 2px;
   border-radius: 2px;
