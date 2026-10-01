@@ -6,7 +6,6 @@ export function ScrollToTop() {
   const btnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    // Avoid showing a floating control until the visitor has moved down the page.
     const onScroll = () => setVisible(window.scrollY > 400);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -14,7 +13,6 @@ export function ScrollToTop() {
   }, []);
 
   const handleClick = () => {
-    // Honor OS motion preferences, then return keyboard focus to the page content.
     const reduced =
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;

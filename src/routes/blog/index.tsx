@@ -6,7 +6,6 @@ import { Reveal } from "@/components/reveal";
 import { buildSrcSet } from "@/lib/image-resize";
 
 
-// Keep list queries small; page number is represented in the URL search string.
 const POSTS_PER_PAGE = 9;
 
 const searchSchema = z.object({
@@ -14,7 +13,6 @@ const searchSchema = z.object({
 });
 
 export const Route = createFileRoute("/blog/")({
-  // Coerce `?page=2` from a URL string and recover to page 1 for invalid values.
   validateSearch: searchSchema,
   head: () => ({
     meta: [
@@ -49,7 +47,6 @@ function BlogIndex() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Supabase range bounds are zero-based and inclusive, hence page 1 is 0–8.
     const from = (page - 1) * POSTS_PER_PAGE;
     const to = from + POSTS_PER_PAGE - 1;
     setLoading(true);
@@ -180,8 +177,6 @@ function BlogIndex() {
 
 /** Build a compact pager: 1 … 4 5 [6] 7 8 … 20 */
 function buildPageList(current: number, total: number): Array<number | "…"> {
-  // Show every page for short lists; for longer lists keep the first, last,
-  // current, and adjacent page visible with ellipses for skipped ranges.
   if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
   const pages: Array<number | "…"> = [1];
   const start = Math.max(2, current - 1);

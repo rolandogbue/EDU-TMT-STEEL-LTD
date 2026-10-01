@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ProductsGrid, CtaSection } from "@/components/site-sections";
 
-// Product catalog page; actual catalog data lives in content/site.ts.
 export const Route = createFileRoute("/products")({
   head: () => ({
     meta: [

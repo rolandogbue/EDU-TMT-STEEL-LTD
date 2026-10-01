@@ -57,25 +57,25 @@ publishing blog content and managing site branding.
 | Layer     | Technology                                                        |
 |-----------|-------------------------------------------------------------------|
 | Framework | TanStack Start v1 (React 19, file-based routing, SSR)             |
-| Build     | Vite 7 with `@tailwindcss/vite` (Lightning CSS)                   |
+| Build     | Vite 8 with `@tailwindcss/vite` and Nitro                        |
 | Styling   | Tailwind CSS v4 (CSS-first `@theme`) + shadcn/ui                  |
 | Icons     | `react-icons`, `lucide-react`                                     |
 | Data      | TanStack Query v5 (route-loader primed cache)                     |
-| Backend   | Supabase project you configure (Postgres, Auth, Storage)           |
-| Hosting   | Edge worker (Cloudflare `workerd`, `nodejs_compat`)               |
+| Backend   | Supabase (Postgres, Auth, Storage)                                |
+| Hosting   | Vercel (TanStack Start server output built by Nitro)              |
 
 ### High-level architecture
 
 ```text
-Browser ──HTTPS──► Edge Worker (TanStack Start SSR)
+Browser ──HTTPS──► Vercel (TanStack Start SSR)
                           │
                           ├── Static assets (Vite build)
                           ├── Server functions (createServerFn)
                           └── Supabase JS ─► Postgres / Auth / Storage
 ```
 
-- **Public pages** are SSR'd for SEO. They read published data via the
-  browser Supabase client with the publishable (anon) key and RLS.
+- **Public pages** are server-rendered for SEO. Published data is read from
+  Supabase with the publishable key and protected by RLS.
 - **Admin pages** live under `_authenticated/` — client-only, gated by a
   Supabase session check, and act as the signed-in admin (RLS-enforced).
 
@@ -143,28 +143,25 @@ schedule when scheduled posts are used.
 
 ### Storage
 
-- Bucket **`site-assets`** (public-read) — stores logos, favicons, blog cover
-  images. Public URLs are generated via `getPublicUrl` at upload time and
-  stored in the corresponding row.
+- Bucket **`site-assets`** (public read) — stores logos, favicons, and blog
+  cover images. Admin-only storage policies restrict uploads, updates, and
+  deletes. Public URLs are generated with `getPublicUrl` and stored in the
+  corresponding row.
 
 ---
 
 ## 4. Installation & Deployment
 
-New contributors can start with the [Developer Guide](DEVELOPER_GUIDE.md),
-which explains the route tree, Supabase auth flow, admin roles, blog data flow,
-and migration conventions.
-
 ### Prerequisites
 
-- Node 22+ with npm.
-- A Supabase project you own; see [SETUP.md](../SETUP.md).
+- Node.js 22+ and npm.
+- A Supabase project with the migrations applied.
 
 ### Local install
 
 ```bash
 npm ci
-npm run dev        # http://localhost:8080
+npm run dev         # http://localhost:8080
 ```
 
 Production build & preview:
@@ -176,16 +173,18 @@ npm run preview
 
 ### Deployment
 
-Deploy the server and configure your Supabase project using
-[docs/DEPLOYMENT.md](DEPLOYMENT.md). Database migrations are applied with the
-Supabase CLI; they are not automatically applied by the app host.
+Push the source to GitHub, connect the repository to Vercel, and configure the
+environment variables below. Vercel deploys production from the selected
+branch and preview builds for pull requests. Apply database changes through
+the reviewed Supabase migration workflow described in
+[docs/DEPLOYMENT.md](DEPLOYMENT.md).
 
 ---
 
 ## 5. Environment Configuration
 
-Copy `.env.example` to `.env` for local development. In production, configure
-these values in your host's environment/secret settings.
+Copy `.env.example` to `.env` for local development. In Vercel, set the same
+values through Project Settings → Environment Variables.
 
 | Variable                        | Scope   | Purpose                                    |
 |---------------------------------|---------|--------------------------------------------|
@@ -193,7 +192,8 @@ these values in your host's environment/secret settings.
 | `VITE_SUPABASE_PUBLISHABLE_KEY` | Client  | Anon/publishable API key.                  |
 | `SUPABASE_URL`                  | Server  | SSR-time Supabase URL.                     |
 | `SUPABASE_PUBLISHABLE_KEY`      | Server  | SSR-time publishable key.                  |
-| `SUPABASE_SERVICE_ROLE_KEY`     | Server  | Privileged operations only.                |
+| `SUPABASE_SECRET_KEY`           | Server  | Privileged operations only.                |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Server  | Legacy name for the secret key.            |
 
 Never expose service-role keys to the browser. Read `process.env.*` inside
 server-function handlers only, never at module scope.
@@ -379,20 +379,19 @@ admin on next signup.
 - **Content sanitisation.** Blog body is Markdown rendered by
   `react-markdown`; raw HTML is not enabled.
 - **OAuth redirect_uri** must be same-origin public routes.
-- **`.env` values** are local/private and must never be committed.
+- **`.env` values** are local and must never be committed.
 
 ---
 
 ## 12. Maintenance, Backup & Recovery
 
-- **Database backups.** Configure and verify backups in your Supabase project;
-  availability depends on your Supabase plan.
-- **Storage backups.** Back up the `site-assets` bucket separately.
+- **Database backups.** Managed automatically by the Cloud provider
+  (point-in-time recovery on managed Supabase). No manual action required.
+- **Storage backups.** `site-assets` bucket is included in project backups.
 - **Migrations.** All schema changes live in `supabase/migrations/` as
   timestamped SQL files. Never edit an applied migration in place — create a
   new one.
-- **Rollback.** Restore from the backup/PITR options available on your
-  Supabase plan; redeploy the
+- **Rollback.** Restore from the Cloud dashboard's PITR window; redeploy the
   matching git commit.
 - **Scheduled tasks.** `publish_scheduled_posts()` should be scheduled if
   scheduled publishing is used (edge cron or `pg_cron`).
@@ -424,7 +423,7 @@ admin on next signup.
 - Added this documentation set (`docs/`).
 
 ### v0.2.0 — CMS & admin
-- Supabase backend configured; `blog_posts`, `blog_categories`, `blog_tags`,
+- Supabase backend; `blog_posts`, `blog_categories`, `blog_tags`,
   `site_settings`, `user_roles` schemas.
 - Admin dashboard, post editor with Markdown + cover upload, settings page.
 - Dynamic logo/favicon.
@@ -442,7 +441,7 @@ admin on next signup.
 
 1. Read [Architecture](#2-architecture--technology-stack) and
    [Folder Structure](#6-folder--codebase-structure).
-2. `npm ci && npm run dev`.
+2. `npm ci && npm run dev` after configuring `.env`.
 3. Sign up at `/auth` with the configured admin email.
 4. Skim `src/routes/__root.tsx` to see providers, head, header/footer wiring.
 5. Read one route end-to-end: `src/routes/blog/index.tsx`.
@@ -459,12 +458,12 @@ admin on next signup.
   and `@theme inline`.
 - **Icons** — `react-icons` for brand/social/product accents, `lucide-react`
   for shadcn primitives.
-- **Migrations** — use Supabase CLI; every new public-schema
+- **Migrations** — use Supabase CLI migrations; every new public-schema
   table needs GRANTs + RLS + policies in the same migration.
 
 ### Local test loop
 
-- Build with `npm run build` before deploying.
+- GitHub Actions runs lint, typecheck, and build checks for pull requests.
 - Manual smoke: `/`, `/blog`, `/blog/<slug>`, `/admin` (as admin).
 
 ---
@@ -480,7 +479,7 @@ admin on next signup.
   home.
 - **Category & tag pages** — `/blog/category/:slug`, `/blog/tag/:slug`.
 - **Search** — full-text search over blog + products.
-- **Analytics** — first-party analytics via edge worker.
+- **Analytics** — first-party analytics via server routes or a managed provider.
 - **Cron for scheduled posts** — wire `publish_scheduled_posts()` to a
   scheduled edge invocation.
 - **Sitemap for taxonomy** — extend `sitemap.xml` once category/tag pages

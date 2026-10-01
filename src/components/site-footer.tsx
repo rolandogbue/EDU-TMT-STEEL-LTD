@@ -3,7 +3,6 @@ import { FaFacebookF, FaLinkedinIn, FaInstagram, FaXTwitter, FaWhatsapp } from "
 import { Logo } from "@/components/logo";
 
 export function SiteFooter() {
-  // Shared footer keeps navigation, social links, and contact details consistent.
   return (
     <footer className="footer">
       <div className="footer-inner">

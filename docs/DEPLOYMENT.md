@@ -1,57 +1,100 @@
-# Deployment
+# GitHub, Vercel, and Supabase deployment
 
-The app is a server-rendered TanStack Start application. Deploy its server to a host you control and connect it to a Supabase project you own. Public pages, authentication, blog content, and uploaded assets all use the configured Supabase backend.
+The application runs as a TanStack Start server built by Vite and Nitro. GitHub
+stores the source and runs checks, Vercel builds and serves the web app, and
+Supabase provides Postgres, authentication, and file storage. The application
+uses the standard Vite, TanStack Start, and Supabase clients directly.
 
-## Before deployment
+## Deployment flow
 
-1. Create your Supabase project and follow [SETUP.md](../SETUP.md) to apply migrations, create the `site-assets` bucket, set the initial admin email, and configure Auth redirect URLs.
-2. If you are moving from a different backend, migrate database records and Storage files before switching traffic. Auth passwords are not exportable; users will need invitations or password resets. Keep the old backend until you have verified the new one.
-3. Build with Node.js 22+ and npm:
+1. Push a branch or open a pull request in GitHub. The `CI` workflow runs lint,
+   TypeScript, and a production build.
+2. Connect the repository to Vercel. Pull requests receive Preview deployments;
+   merges to the configured production branch deploy Production.
+3. Apply Supabase schema changes from the `Supabase migrations` workflow after
+   reviewing the migrations in the pull request. This workflow is manual so a
+   schema change is not applied to production just because a commit merged.
 
-   ```sh
-   npm ci
-   npm run build
-   ```
+## Vercel settings
 
-The Vite config emits a Cloudflare Worker by default and uses Vercel's build output when `VERCEL=1` is set. Set the environment variables below on the host. `VITE_` values are embedded during the build, so configure them before building.
+Use these project build settings:
 
-## Required environment
+| Setting          | Value                       |
+| ---------------- | --------------------------- |
+| Install command  | `npm ci`                    |
+| Build command    | `npm run build`             |
+| Output directory | Leave the framework default |
 
-| Variable                        | Notes                                                          |
-| ------------------------------- | -------------------------------------------------------------- |
-| `VITE_SUPABASE_URL`             | Your project's public URL; used in the browser bundle          |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | Your project's publishable/anon key; public by design          |
-| `SUPABASE_URL`                  | Same project URL, available to the server runtime              |
-| `SUPABASE_PUBLISHABLE_KEY`      | Same publishable key, available to the server runtime          |
-| `SUPABASE_SERVICE_ROLE_KEY`     | Server-only secret; enables bootstrap and team/role management |
+The `vercel.json` framework entry helps Vercel identify TanStack Start. Nitro
+creates the server output in the format Vercel expects.
 
-Keep the service-role key in the host's secret manager. It bypasses row-level security and must never be exposed in browser code or committed to the repository. If omitted, the app will still use Supabase for public site, sign-in, and blog operations, but the initial-admin bootstrap and Team & roles admin functions are disabled.
+Configure the following variables for Preview and Production environments:
 
-## Cloudflare Workers
+| Name                            | Scope                    | Purpose                                       |
+| ------------------------------- | ------------------------ | --------------------------------------------- |
+| `VITE_SUPABASE_URL`             | Browser build            | Supabase project URL used by browser requests |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Browser build            | Public Supabase key used with RLS policies    |
+| `SUPABASE_URL`                  | Server runtime           | Supabase project URL used during SSR          |
+| `SUPABASE_PUBLISHABLE_KEY`      | Server runtime           | Public key used for server-side user requests |
+| `SUPABASE_SECRET_KEY`           | Server runtime, optional | Restricted admin bootstrap/team operations    |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Server runtime, legacy   | Legacy name for the server secret key          |
 
-The repository includes `wrangler.toml` and builds to a Worker by default.
+The service-role key bypasses RLS. Add it only as a Vercel server environment
+variable; never name it with a `VITE_` prefix and never commit it to GitHub.
+Vercel build-time `VITE_` values require a new deployment after they change.
 
-```sh
-npx wrangler login
-npx wrangler secret put SUPABASE_URL
-npx wrangler secret put SUPABASE_PUBLISHABLE_KEY
-npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
-npx wrangler deploy
-```
+## Supabase setup
 
-For a deploy preview, use `npx wrangler deploy --dry-run`. Add the `VITE_` variables to the build environment in CI before `npm run build`.
+1. Create a Supabase project and record its project ref, URL, and publishable
+   key.
+2. Set the initial administrator email in the initial SQL migration before
+   applying it for the first time.
+3. Link the CLI, inspect `npx supabase migration list --linked`, and apply
+   pending migrations with `npx supabase db push`, or use the GitHub workflow
+   below. Supabase compares the timestamp version at the start of each file;
+   the descriptive filename suffix does not create a separate version.
+4. In Supabase Authentication settings, set the site URL to the production
+   domain and add the Vercel Preview domains you use to the redirect URL list.
+5. Create the administrator account at `/auth` after migrations have been
+   applied.
 
-## Vercel
+## GitHub migration workflow
 
-Import the repository into Vercel and set the Build Command to `npm run build` and Install Command to `npm ci`. Add all five environment variables above for each environment. Vercel sets `VERCEL=1` during build. Redeploy after changing build-time `VITE_` values.
+The manual workflow in `.github/workflows/deploy-supabase-migrations.yml` runs
+`supabase db push --dry-run` before applying migrations against the project ref
+selected at dispatch. Add these in
+GitHub repository **Settings → Secrets and variables → Actions**:
 
-## After deployment
+- Secret `SUPABASE_ACCESS_TOKEN`: Supabase personal access token used by the CLI.
+- Secret `SUPABASE_DB_PASSWORD`: database password for the selected project.
+- Variable `SUPABASE_PROJECT_REF`: project ref, for example `abcdefghijklmno`.
 
-1. Confirm the homepage and `/sitemap.xml` load.
-2. Sign in at `/auth` with the initial admin account and immediately change its initial password.
-3. Confirm `/admin` opens, create a draft blog post, and check that images can be uploaded to `site-assets`.
-4. Publish a post and confirm it appears on `/blog`.
+Run **Actions → Supabase migrations → Run workflow** after the migrations have
+been reviewed. The workflow requires the selected ref to equal the configured
+project ref, which helps prevent applying production migrations to the wrong
+project.
 
-## Backend switch checklist
+Before migration deployment, make sure local and remote versions agree. A
+linked reset (`supabase db reset --linked`) destroys remote user-created
+database objects and data before replaying local migrations. Use it only for a
+disposable project. When the schema is correct but migration history is wrong,
+diagnose the specific version mismatch and repair only that tracking entry;
+`supabase migration repair` changes migration history but does not run or undo
+the migration SQL.
 
-Pointing the app at a different Supabase URL switches which backend it reads; it does not transfer data. Before switching production traffic, copy the needed `site_settings`, categories, tags, posts, and Storage objects; create or invite users in the new Auth project; and verify access policies, redirect URLs, and image URLs. The SQL migrations create the schema, not a copy of production data.
+## Environment files and secrets
+
+`.env.example` documents the local configuration. Copy it to `.env` for local
+development; `.gitignore` excludes `.env` and other local environment files.
+The browser publishable key is public, but database RLS policies must remain
+enabled. Do not commit database passwords, access tokens, or service-role keys.
+
+## Troubleshooting
+
+| Symptom                                  | Check                                                                                |
+| ---------------------------------------- | ------------------------------------------------------------------------------------ |
+| Missing Supabase variables               | Configure the `VITE_` pair and server pair in Vercel, then redeploy.                 |
+| Sign-in works but admin pages are denied | Confirm migrations ran and the signed-in user has the intended role.                 |
+| Uploads fail                             | Confirm the `site-assets` storage policies from the migrations are installed.        |
+| Migration action fails to authenticate   | Check the project access token, database password, and project ref secrets/variable. |
+| Local build fails during install         | Use Node 22 and `npm ci` so the lockfile is respected.                               |

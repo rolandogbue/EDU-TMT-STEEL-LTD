@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AudienceGrid, WhySection, ProofSection, CtaSection } from "@/components/site-sections";
 
-// About page: the route provides metadata; shared sections hold reusable layout.
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [

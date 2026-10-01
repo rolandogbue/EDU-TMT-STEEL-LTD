@@ -8,7 +8,6 @@ import { COVER_WIDTHS, buildSrcSet, resizeCoverImage } from "@/lib/image-resize"
 type Category = { id: string; name: string };
 type Status = "draft" | "published" | "scheduled";
 
-// Convert titles and tags to URL-safe identifiers used as unique DB slugs.
 const slugify = (s: string) =>
   s
     .toLowerCase()
@@ -17,9 +16,14 @@ const slugify = (s: string) =>
     .replace(/^-+|-+$/g, "")
     .slice(0, 80);
 
+const toDateTimeLocalValue = (value: string | Date | null | undefined) => {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return new Date(date.getTime() - date.getTimezoneOffset() * 60_000).toISOString().slice(0, 16);
+};
+
 export function PostEditor({ postId, onSaved }: { postId?: string; onSaved?: (id: string) => void }) {
-  // A supplied ID means edit mode; otherwise the form creates a new draft.
-  // Form state is grouped by purpose: core copy, publishing, taxonomy, SEO, media.
   const [loading, setLoading] = useState(!!postId);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,14 +42,25 @@ export function PostEditor({ postId, onSaved }: { postId?: string; onSaved?: (id
 
   const [status, setStatus] = useState<Status>("draft");
   const [publishedAt, setPublishedAt] = useState<string>("");
+  const [originalStatus, setOriginalStatus] = useState<Status>("draft");
+  const [originalPublishedAt, setOriginalPublishedAt] = useState<string | null>(null);
   const [seoTitle, setSeoTitle] = useState("");
   const [seoDescription, setSeoDescription] = useState("");
   const [categoryId, setCategoryId] = useState<string>("");
   const [tags, setTags] = useState<string>("");
   const [authorName, setAuthorName] = useState("");
+  const saveButtonLabels: Record<Status, string> = {
+    draft: "Save draft",
+    published: "Publish now",
+    scheduled: "Schedule post",
+  };
+  const savingButtonLabels: Record<Status, string> = {
+    draft: "Saving…",
+    published: "Publishing…",
+    scheduled: "Scheduling…",
+  };
 
   useEffect(() => {
-    // Categories are shared reference data for the category selector.
     supabase.from("blog_categories").select("id,name").order("name").then(({ data }) => {
       setCategories((data ?? []) as Category[]);
     });
@@ -53,7 +68,6 @@ export function PostEditor({ postId, onSaved }: { postId?: string; onSaved?: (id
 
   useEffect(() => {
     if (!postId) return;
-    // Hydrate every editable field and the post's existing tag names.
     (async () => {
       const { data: post } = await supabase.from("blog_posts").select("*").eq("id", postId).maybeSingle();
       if (post) {
@@ -65,8 +79,11 @@ export function PostEditor({ postId, onSaved }: { postId?: string; onSaved?: (id
         setCoverImage(post.cover_image ?? "");
         setCoverSrcset((post.cover_image_srcset as Record<string, string> | null) ?? null);
 
-        setStatus((post.status as Status) ?? "draft");
-        setPublishedAt(post.published_at ? new Date(post.published_at).toISOString().slice(0, 16) : "");
+        const loadedStatus = (post.status as Status) ?? "draft";
+        setStatus(loadedStatus);
+        setOriginalStatus(loadedStatus);
+        setOriginalPublishedAt(post.published_at ?? null);
+        setPublishedAt(toDateTimeLocalValue(post.published_at));
         setSeoTitle(post.seo_title ?? "");
         setSeoDescription(post.seo_description ?? "");
         setCategoryId(post.category_id ?? "");
@@ -85,7 +102,6 @@ export function PostEditor({ postId, onSaved }: { postId?: string; onSaved?: (id
   }, [postId]);
 
   useEffect(() => {
-    // Auto-create the URL slug until an editor manually changes it.
     if (!slugTouched) setSlug(slugify(title));
   }, [title, slugTouched]);
 
@@ -93,8 +109,6 @@ export function PostEditor({ postId, onSaved }: { postId?: string; onSaved?: (id
     setError(null);
     setCoverUploading(true);
     try {
-      // Create optimized size variants in the browser, then save their public
-      // URLs as a srcset map so readers can download an appropriate size.
       const variants = await resizeCoverImage(file);
       const folder = `blog/${crypto.randomUUID()}`;
       const uploadedSrcset: Record<string, string> = {};
@@ -112,7 +126,8 @@ export function PostEditor({ postId, onSaved }: { postId?: string; onSaved?: (id
       setCoverSrcset(uploadedSrcset);
       setCoverImage(largestUrl || uploadedSrcset[String(COVER_WIDTHS[0])]);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Cover upload failed");
+      if (import.meta.env.DEV) console.error("Cover image upload failed", e);
+      setError("We couldn't upload the cover image. Please try again.");
     } finally {
       setCoverUploading(false);
     }
@@ -120,8 +135,6 @@ export function PostEditor({ postId, onSaved }: { postId?: string; onSaved?: (id
 
 
   const upsertTags = async (postId: string, tagString: string) => {
-    // Tags are normalized/upserted first, then the post-to-tag join rows are
-    // replaced so the stored set matches exactly what the editor entered.
     const names = tagString.split(",").map((t) => t.trim()).filter(Boolean);
     if (!names.length) {
       await supabase.from("blog_post_tags").delete().eq("post_id", postId);
@@ -146,11 +159,18 @@ export function PostEditor({ postId, onSaved }: { postId?: string; onSaved?: (id
     if (!title.trim()) { setError("Title is required"); return; }
     const finalSlug = slug.trim() || slugify(title);
     if (!finalSlug) { setError("A URL slug is required"); return; }
+    const scheduledDate = status === "scheduled" && publishedAt ? new Date(publishedAt) : null;
+    const hasValidSchedule =
+      !!scheduledDate &&
+      !Number.isNaN(scheduledDate.getTime()) &&
+      scheduledDate.getTime() > Date.now();
+    if (status === "scheduled" && !hasValidSchedule) {
+      setError("Choose a publish date and time in the future.");
+      return;
+    }
     setSaving(true);
     try {
       const { data: userData } = await supabase.auth.getUser();
-      // Keep status, publication date, metadata, and author together in one row.
-      // Drafts intentionally have no public publication timestamp.
       const payload = {
         title: title.trim().slice(0, 200),
         slug: finalSlug,
@@ -163,16 +183,19 @@ export function PostEditor({ postId, onSaved }: { postId?: string; onSaved?: (id
         published_at:
           status === "draft"
             ? null
-            : publishedAt
-              ? new Date(publishedAt).toISOString()
-              : new Date().toISOString(),
+            : status === "scheduled"
+              ? (scheduledDate?.toISOString() ?? null)
+              : originalStatus === "published" &&
+                  originalPublishedAt &&
+                  new Date(originalPublishedAt).getTime() <= Date.now()
+                ? originalPublishedAt
+                : new Date().toISOString(),
         seo_title: seoTitle.trim().slice(0, 70) || null,
         seo_description: seoDescription.trim().slice(0, 160) || null,
         category_id: categoryId || null,
         author_id: userData.user?.id ?? null,
         author_name: authorName.trim().slice(0, 80) || userData.user?.email || null,
       };
-      // Update an existing post or insert a new row and capture its generated ID.
       let id = postId;
       if (id) {
         const { error } = await supabase.from("blog_posts").update(payload).eq("id", id);
@@ -183,10 +206,21 @@ export function PostEditor({ postId, onSaved }: { postId?: string; onSaved?: (id
         id = data.id;
       }
       if (id) await upsertTags(id, tags);
-      setMsg("Saved successfully");
+      setOriginalStatus(status);
+      setOriginalPublishedAt(payload.published_at);
+      setMsg(
+        status === "draft"
+          ? "Draft saved."
+          : status === "scheduled"
+            ? "Post scheduled."
+            : "Post published.",
+      );
       if (!postId && id && onSaved) onSaved(id);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Save failed");
+      if (import.meta.env.DEV) console.error("Blog post save failed", e);
+      setError(
+        "We couldn't save your post. Please try again. If the problem continues, contact support.",
+      );
     } finally {
       setSaving(false);
     }
@@ -203,7 +237,7 @@ export function PostEditor({ postId, onSaved }: { postId?: string; onSaved?: (id
             {preview ? "Hide preview" : "Preview"}
           </button>
           <button className="btn-large" onClick={save} disabled={saving}>
-            {saving ? "Saving…" : "Save post"}
+            {saving ? savingButtonLabels[status] : saveButtonLabels[status]}
           </button>
         </div>
       </div>
@@ -256,16 +290,24 @@ export function PostEditor({ postId, onSaved }: { postId?: string; onSaved?: (id
                 <option value="scheduled">Scheduled</option>
               </select>
             </label>
-            {status !== "draft" && (
+            {status === "scheduled" && (
               <label className="admin-field">
-                <span>{status === "scheduled" ? "Publish at" : "Published at"}</span>
+                <span>Publish at</span>
                 <input
                   type="datetime-local"
                   value={publishedAt}
+                  required
                   onChange={(e) => setPublishedAt(e.target.value)}
                 />
               </label>
             )}
+            <p className="admin-hint">
+              {status === "draft"
+                ? "Drafts stay private until you publish or schedule them."
+                : status === "scheduled"
+                  ? "This post will publish automatically at the selected time, usually within a minute."
+                  : "This post will appear on the blog as soon as you publish it."}
+            </p>
           </div>
 
           <div className="admin-panel">

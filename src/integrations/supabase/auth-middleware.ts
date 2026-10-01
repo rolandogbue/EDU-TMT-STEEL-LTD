@@ -33,20 +33,24 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
 export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server(
   async ({ next }) => {
     
-    const SUPABASE_URL = process.env.SUPABASE_URL;
-    const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const configuredServerKey = process.env.SUPABASE_PUBLISHABLE_KEY;
+    // A secret key belongs only in the privileged admin client. If a hosting
+    // environment has it in the publishable slot, fall back to the public key.
+    const supabasePublishableKey = configuredServerKey?.startsWith('sb_secret_')
+      ? process.env.VITE_SUPABASE_PUBLISHABLE_KEY
+      : configuredServerKey || process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
-    if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+    if (!supabaseUrl || !supabasePublishableKey) {
       const missing = [
-        ...(!SUPABASE_URL ? ['SUPABASE_URL'] : []),
-        ...(!SUPABASE_PUBLISHABLE_KEY ? ['SUPABASE_PUBLISHABLE_KEY'] : []),
+        ...(!supabaseUrl ? ['SUPABASE_URL'] : []),
+        ...(!supabasePublishableKey ? ['SUPABASE_PUBLISHABLE_KEY (or VITE_SUPABASE_PUBLISHABLE_KEY)'] : []),
       ];
-      const message = `Missing Supabase environment variable(s): ${missing.join(', ')}. Configure your Supabase project environment variables.`;
+      const message = `Missing Supabase environment variable(s): ${missing.join(', ')}. Configure the server environment with your Supabase project values.`;
       console.error(`[Supabase] ${message}`);
       throw new Error(message);
     }
     
-    // Read the bearer token attached by auth-attacher.ts for this request.
     const request = getRequest();
 
     if (!request?.headers) {
@@ -72,14 +76,12 @@ export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server
       throw new Error('Unauthorized: Invalid token');
     }
 
-    // Scope this client to the caller's token so database RLS policies see the
-    // signed-in user, while the publishable key remains the API credential.
     const supabase = createClient<Database>(
-      SUPABASE_URL!,
-      SUPABASE_PUBLISHABLE_KEY!,
+      supabaseUrl,
+      supabasePublishableKey,
       {
         global: {
-          fetch: createSupabaseFetch(SUPABASE_PUBLISHABLE_KEY!),
+          fetch: createSupabaseFetch(supabasePublishableKey),
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -92,7 +94,6 @@ export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server
       }
     );
 
-    // Verify the token with Supabase before trusting its user ID in handlers.
     const { data, error } = await supabase.auth.getClaims(token);
     if (error || !data?.claims) {
       throw new Error('Unauthorized: Invalid token');
@@ -102,7 +103,6 @@ export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server
       throw new Error('Unauthorized: No user ID found in token');
     }
 
-    // Downstream server functions receive only verified identity/context data.
     return next({
       context: {
         supabase,

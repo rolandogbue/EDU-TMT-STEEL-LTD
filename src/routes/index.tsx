@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { TrustBar, ProductsGrid, ServicesGrid, AudienceGrid, WhySection, ProofSection, CtaSection } from "@/components/site-sections";
 import { CONTACT } from "@/content/site";
 
-// The route's head() data is rendered server-side for search and social previews.
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
@@ -23,7 +22,6 @@ const TICKER_ITEMS = [
 ];
 
 function Index() {
-  // Duplicate ticker entries create a seamless loop in the CSS marquee animation.
   const ticker = [...TICKER_ITEMS, ...TICKER_ITEMS];
   return (
     <>

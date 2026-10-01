@@ -20,7 +20,6 @@ function BlogList() {
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
-    // Admins/content managers can see drafts as allowed by the blog_posts RLS policy.
     setLoading(true);
     const { data } = await supabase
       .from("blog_posts")
@@ -33,7 +32,6 @@ function BlogList() {
   useEffect(() => { load(); }, [load]);
 
   const remove = async (id: string) => {
-    // Confirm destructive changes; only refresh the list after the delete request.
     if (!confirm("Delete this post? This cannot be undone.")) return;
     await supabase.from("blog_posts").delete().eq("id", id);
     load();

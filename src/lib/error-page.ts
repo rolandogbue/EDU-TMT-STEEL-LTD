@@ -1,4 +1,3 @@
-/** Minimal HTML fallback used when SSR fails before the React app can render. */
 export function renderErrorPage(): string {
   return `<!doctype html>
 <html lang="en">

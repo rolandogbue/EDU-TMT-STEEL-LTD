@@ -21,7 +21,6 @@ type Post = {
 
 
 export const Route = createFileRoute("/blog/$slug")({
-  // The slug is the stable public URL key; RLS and filters expose only live posts.
   loader: async ({ params }) => {
     const { data } = await supabase
       .from("blog_posts")
@@ -34,7 +33,6 @@ export const Route = createFileRoute("/blog/$slug")({
     if (!data) throw notFound();
     return data as Post;
   },
-  // Build social/search metadata from the post, with sensible copy fallbacks.
   head: ({ loaderData }) => {
     if (!loaderData) return {};
     const title = loaderData.seo_title || `${loaderData.title} | EDU TMT Steel`;
@@ -73,7 +71,6 @@ function BlogPost() {
   const post = Route.useLoaderData();
   const [tags, setTags] = useState<string[]>([]);
 
-  // Tags are a many-to-many relation and are loaded separately from the post body.
   useEffect(() => {
     supabase
       .from("blog_post_tags")

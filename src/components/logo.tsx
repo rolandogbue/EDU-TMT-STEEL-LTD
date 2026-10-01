@@ -3,7 +3,6 @@ import { BRANDING } from "@/config/branding";
 import { useSiteSettings } from "@/lib/site-settings";
 
 export function Logo({ onClick, style }: { onClick?: () => void; style?: React.CSSProperties }) {
-  // An uploaded site logo takes precedence over the bundled brand fallback.
   const { settings } = useSiteSettings();
   const logoSrc = settings.logo_url ?? BRANDING.logoSrc;
 

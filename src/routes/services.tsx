@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ServicesGrid, CtaSection } from "@/components/site-sections";
 
-// Service overview page; shared service cards are rendered by ServicesGrid.
 export const Route = createFileRoute("/services")({
   head: () => ({
     meta: [

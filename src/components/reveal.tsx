@@ -13,8 +13,6 @@ export function Reveal({ children, delay = 0, as = "div", className = "", style 
   const [shown, setShown] = useState(false);
 
   useEffect(() => {
-    // Start animation when the element enters view; disconnect after the first
-    // reveal so many cards do not keep unnecessary observers running.
     const node = ref.current;
     if (!node) return;
     if (typeof IntersectionObserver === "undefined") {

@@ -12,29 +12,40 @@ type Role = "admin" | "content_manager";
 function AdminLayout() {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
-  const [role, setRole] = useState<Role | null | "none">(null);
+  const [role, setRole] = useState<Role | null | "none" | "error">(null);
 
   useEffect(() => {
-    // The authenticated route guarantees a session, but check again here to
-    // load app roles and provide a friendly fallback if the session expired.
     (async () => {
-      const { data } = await supabase.auth.getUser();
-      const u = data.user;
-      setUser(u);
-      if (!u) {
-        navigate({ to: "/auth" });
-        return;
+      try {
+        const { data, error } = await supabase.auth.getUser();
+        const u = data.user;
+        setUser(u);
+        if (error) {
+          setRole("error");
+          return;
+        }
+        if (!u) {
+          navigate({ to: "/auth" });
+          return;
+        }
+        const { data: roles, error: rolesError } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", u.id);
+        if (rolesError) {
+          setRole("error");
+          return;
+        }
+        const list = (roles ?? []).map((r) => r.role as Role);
+        setRole(list.includes("admin") ? "admin" : list.includes("content_manager") ? "content_manager" : "none");
+      } catch (error) {
+        if (import.meta.env.DEV) console.error("Could not verify admin access", error);
+        setRole("error");
       }
-      const { data: roles } = await supabase.from("user_roles").select("role").eq("user_id", u.id);
-      // Only these two roles can enter the admin shell; settings navigation is
-      // shown to admins alone below.
-      const list = (roles ?? []).map((r) => r.role as Role);
-      setRole(list.includes("admin") ? "admin" : list.includes("content_manager") ? "content_manager" : "none");
     })();
   }, [navigate]);
 
   const signOut = async () => {
-    // Clear the persisted Supabase session before sending the user to sign-in.
     await supabase.auth.signOut();
     navigate({ to: "/auth" });
   };
@@ -49,6 +60,18 @@ function AdminLayout() {
         <div className="admin-forbidden">
           <h1>Not authorised</h1>
           <p>Your account <strong>{user?.email}</strong> does not have admin access.</p>
+          <button className="btn-outline" onClick={signOut}>Sign out</button>
+        </div>
+      </div>
+    );
+  }
+
+  if (role === "error") {
+    return (
+      <div className="admin-shell">
+        <div className="admin-forbidden">
+          <h1>Unable to verify access</h1>
+          <p>Please refresh the page. If the problem continues, contact support.</p>
           <button className="btn-outline" onClick={signOut}>Sign out</button>
         </div>
       </div>

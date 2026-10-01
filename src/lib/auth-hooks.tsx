@@ -1,51 +1,63 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
 
+type AppRole = Database["public"]["Enums"]["app_role"];
 type AuthContextValue = { isAdmin: boolean };
 
-const AuthContext = createContext<AuthContextValue>({ isAdmin: false });
+const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-/** Keeps the global navigation in sync with the signed-in user's admin role. */
+/** Provides the signed-in user's administrative access to shared UI. */
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const [userId, setUserId] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
 
+  // Keep the current user in sync with sign-in, sign-out, and token refresh events.
   useEffect(() => {
-    let active = true;
+    let isMounted = true;
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (isMounted) setUserId(session?.user.id ?? null);
+    });
 
-    // Roles are read from Supabase under the user's session/RLS policies.
-    const refreshRole = async (user: User | null) => {
-      if (!user) {
-        if (active) setIsAdmin(false);
-        return;
-      }
-
-      const { data } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id);
-      if (active) setIsAdmin((data ?? []).some((row) => row.role === "admin"));
-    };
-
-    // Load the persisted session once, then listen for login/logout/token changes.
-    void supabase.auth.getUser().then(({ data }) => refreshRole(data.user));
-
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      // Let Supabase finish its auth callback before making another client request.
-      setTimeout(() => void refreshRole(session?.user ?? null), 0);
+    void supabase.auth.getSession().then(({ data: sessionData }) => {
+      if (isMounted) setUserId(sessionData.session?.user.id ?? null);
     });
 
     return () => {
-      active = false;
-      authListener.subscription.unsubscribe();
+      isMounted = false;
+      data.subscription.unsubscribe();
     };
   }, []);
+
+  // Only users with an admin or content-manager role see the admin navigation.
+  useEffect(() => {
+    if (!userId) {
+      setIsAdmin(false);
+      return;
+    }
+
+    let isCurrentUser = true;
+    void supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .then(({ data: roles, error }) => {
+        if (!isCurrentUser) return;
+        const allowedRoles: AppRole[] = ["admin", "content_manager"];
+        setIsAdmin(!error && (roles ?? []).some(({ role }) => allowedRoles.includes(role)));
+      });
+
+    return () => {
+      isCurrentUser = false;
+    };
+  }, [userId]);
 
   return <AuthContext.Provider value={{ isAdmin }}>{children}</AuthContext.Provider>;
 }
 
-export function useAuth() {
-  // The default false value also lets error/not-found shells render outside the
-  // normal provider tree without exposing admin navigation.
-  return useContext(AuthContext);
+/** Returns auth state for components rendered beneath AuthProvider. */
+export function useAuth(): AuthContextValue {
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("useAuth must be used within AuthProvider.");
+  return context;
 }

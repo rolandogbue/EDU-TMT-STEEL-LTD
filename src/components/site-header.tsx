@@ -10,7 +10,6 @@ export function SiteHeader() {
   const { isAdmin } = useAuth();
 
   useEffect(() => {
-    // Toggle the compact header style after the visitor scrolls down the page.
     const onScroll = () => setScrolled(window.scrollY > 60);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -33,7 +32,6 @@ export function SiteHeader() {
         <li><Link to="/blog" activeProps={{ className: "active" }} onClick={close}>Blog</Link></li>
         <li><Link to="/about" activeProps={{ className: "active" }} onClick={close}>About</Link></li>
         <li><Link to="/contact" activeProps={{ className: "active" }} onClick={close}>Contact</Link></li>
-        {/* Navigation visibility is a convenience; route/server checks remain the security boundary. */}
         {isAdmin && (
           <li><Link to="/admin" activeProps={{ className: "active" }} onClick={close}>Admin</Link></li>
         )}

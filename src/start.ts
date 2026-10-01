@@ -1,10 +1,12 @@
-import { createStart, createMiddleware } from "@tanstack/react-start";
+import {
+  createCsrfMiddleware,
+  createMiddleware,
+  createStart,
+} from "@tanstack/react-start";
 
 import { renderErrorPage } from "./lib/error-page";
 import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
 
-// Convert unexpected server-function failures into a small HTML error response
-// while preserving framework control-flow errors such as redirects.
 const errorMiddleware = createMiddleware().server(async ({ next }) => {
   try {
     return await next();
@@ -20,9 +22,11 @@ const errorMiddleware = createMiddleware().server(async ({ next }) => {
   }
 });
 
+const csrfMiddleware = createCsrfMiddleware({
+  filter: (ctx) => ctx.handlerType === "serverFn",
+});
+
 export const startInstance = createStart(() => ({
-  // Client middleware attaches the user's Supabase token to server functions.
   functionMiddleware: [attachSupabaseAuth],
-  // Request middleware catches failures around server-rendered/function requests.
-  requestMiddleware: [errorMiddleware],
+  requestMiddleware: [errorMiddleware, csrfMiddleware],
 }));

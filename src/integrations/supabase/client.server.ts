@@ -29,25 +29,23 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
   };
 }
 
-// This client bypasses RLS. Keep its key in server secrets and call it only
-// after a server-side authorization check.
 function createSupabaseAdminClient() {
-  const SUPABASE_URL = process.env.SUPABASE_URL;
-  const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+  if (!supabaseUrl || !serviceRoleKey) {
     const missing = [
-      ...(!SUPABASE_URL ? ['SUPABASE_URL'] : []),
-      ...(!SUPABASE_SERVICE_ROLE_KEY ? ['SUPABASE_SERVICE_ROLE_KEY'] : []),
+      ...(!supabaseUrl ? ['SUPABASE_URL'] : []),
+      ...(!serviceRoleKey ? ['SUPABASE_SECRET_KEY or SUPABASE_SERVICE_ROLE_KEY'] : []),
     ];
-    const message = `Missing Supabase environment variable(s): ${missing.join(', ')}. Configure your Supabase project environment variables.`;
+    const message = `Missing Supabase environment variable(s): ${missing.join(', ')}. Configure your server environment with Supabase project values.`;
     console.error(`[Supabase] ${message}`);
     throw new Error(message);
   }
 
-  return createClient<Database>(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+  return createClient<Database>(supabaseUrl, serviceRoleKey, {
     global: {
-      fetch: createSupabaseFetch(SUPABASE_SERVICE_ROLE_KEY),
+      fetch: createSupabaseFetch(serviceRoleKey),
     },
     auth: {
       storage: undefined,
@@ -57,8 +55,7 @@ function createSupabaseAdminClient() {
   });
 }
 
-// Lazily initialize so ordinary public requests do not need a service-role key.
-let _supabaseAdmin: ReturnType<typeof createSupabaseAdminClient> | undefined;
+let supabaseAdminClient: ReturnType<typeof createSupabaseAdminClient> | undefined;
 
 // Server-side Supabase client with service role - bypasses RLS
 // SECURITY: Only use this for trusted server-side operations, never expose to client code
@@ -66,7 +63,7 @@ let _supabaseAdmin: ReturnType<typeof createSupabaseAdminClient> | undefined;
 // Top-level import is safe only in other .server.ts modules - route files and *.functions.ts ship to the client bundle.
 export const supabaseAdmin = new Proxy({} as ReturnType<typeof createSupabaseAdminClient>, {
   get(_, prop, receiver) {
-    if (!_supabaseAdmin) _supabaseAdmin = createSupabaseAdminClient();
-    return Reflect.get(_supabaseAdmin, prop, receiver);
+    if (!supabaseAdminClient) supabaseAdminClient = createSupabaseAdminClient();
+    return Reflect.get(supabaseAdminClient, prop, receiver);
   },
 });

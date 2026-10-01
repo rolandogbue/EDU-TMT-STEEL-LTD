@@ -1,14 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-// Temporary first-run credential. Require the admin to change it immediately.
 export const DEFAULT_ADMIN_PASSWORD = "ChangeMe123!";
 
 export const Route = createFileRoute("/api/public/bootstrap-admin")({
   server: {
     handlers: {
       POST: async () => {
-        // Load server-only helpers inside the handler so their secret-bearing
-        // module is never included in the browser bundle.
         const { isServiceRoleConfigured, ADMIN_KEY_MISSING_MESSAGE } = await import(
           "@/lib/supabase-admin.server"
         );
@@ -19,8 +16,7 @@ export const Route = createFileRoute("/api/public/bootstrap-admin")({
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
 
-        // This endpoint is intended for first-run setup only. Once any admin
-        // exists, returning a conflict makes repeat calls harmless.
+        // Refuse if any admin already exists.
         const { data: existing, error: existingErr } = await supabaseAdmin
           .from("user_roles")
           .select("user_id")
@@ -38,7 +34,6 @@ export const Route = createFileRoute("/api/public/bootstrap-admin")({
           .maybeSingle();
         if (setErr || !settings) return Response.json({ error: "Missing site settings" }, { status: 500 });
 
-        // The configured email is the identity recognized by the SQL signup trigger.
         const email = settings.admin_email;
 
         const { data: created, error: createErr } = await supabaseAdmin.auth.admin.createUser({

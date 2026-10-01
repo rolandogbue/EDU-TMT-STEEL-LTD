@@ -20,6 +20,7 @@ function SettingsPage() {
   const [savingSite, setSavingSite] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [adminAccess, setAdminAccess] = useState<"checking" | "allowed" | "denied" | "error">("checking");
 
   const [email, setEmail] = useState("");
   const [newEmail, setNewEmail] = useState("");
@@ -42,20 +43,56 @@ function SettingsPage() {
   const [inviting, setInviting] = useState(false);
 
   const loadTeam = useCallback(async () => {
-    // Team reads use authenticated server functions so private Auth Admin API
-    // calls and service-role credentials stay on the server.
     try {
       const rows = await listTeamFn();
       setTeam(rows as TeamRow[]);
       setTeamError(null);
     } catch (e) {
-      // Surfaced in the UI so a missing server admin key is visible on the page
-      // rather than only in the server terminal. See SETUP.md.
-      setTeamError(e instanceof Error ? e.message : "Could not load team members.");
+      if (import.meta.env.DEV) console.error("Could not load team members", e);
+      setTeamError("We couldn't load team members. Please try again or contact support.");
     }
   }, [listTeamFn]);
 
+  const loadCategories = useCallback(async () => {
+    const { data } = await supabase.from("blog_categories").select("id,name,slug").order("name");
+    setCategories((data ?? []) as Category[]);
+  }, []);
 
+
+  useEffect(() => {
+    let active = true;
+    void (async () => {
+      try {
+        const { data: userData, error: userError } = await supabase.auth.getUser();
+        const user = userData.user;
+        if (userError) {
+          if (active) setAdminAccess("error");
+          return;
+        }
+        if (!user) {
+          if (active) setAdminAccess("denied");
+          return;
+        }
+
+        setEmail(user.email ?? "");
+        const { data: roles, error: roleError } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id);
+        const isAdmin = (roles ?? []).some(({ role }) => role === "admin");
+        if (active) {
+          setAdminAccess(roleError ? "error" : isAdmin ? "allowed" : "denied");
+        }
+      } catch (error) {
+        if (import.meta.env.DEV) console.error("Could not verify site settings access", error);
+        if (active) setAdminAccess("error");
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     setLogoUrl(settings.logo_url);
@@ -63,21 +100,14 @@ function SettingsPage() {
   }, [settings.logo_url, settings.favicon_url]);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? ""));
+    if (adminAccess !== "allowed") return;
     loadCategories();
     loadTeam();
-  }, [loadTeam]);
-
-
-  const loadCategories = async () => {
-    const { data } = await supabase.from("blog_categories").select("id,name,slug").order("name");
-    setCategories((data ?? []) as Category[]);
-  };
+  }, [adminAccess, loadCategories, loadTeam]);
 
   const upload = useCallback(async (file: File, kind: "logo" | "favicon") => {
     setError(null); setMsg(null); setUploading(kind);
     try {
-      // Use a unique key so previous assets remain available if settings updates fail.
       const ext = file.name.split(".").pop() || "png";
       const path = `${kind}/${crypto.randomUUID()}.${ext}`;
       const { error: upErr } = await supabase.storage
@@ -95,8 +125,6 @@ function SettingsPage() {
   }, []);
 
   const saveSite = async () => {
-    // Uploading a file does not make it active; this save writes its URL to the
-    // singleton settings row and refreshes the shared site-settings context.
     setError(null); setMsg(null); setSavingSite(true);
     const { error } = await supabase
       .from("site_settings")
@@ -113,7 +141,6 @@ function SettingsPage() {
   const updateAccount = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null); setMsg(null); setUpdatingAccount(true);
-    // Send only fields the administrator changed so blank inputs keep current values.
     const updates: { email?: string; password?: string } = {};
     if (newEmail && newEmail !== email) updates.email = newEmail.trim();
     if (newPassword) {
@@ -135,7 +162,6 @@ function SettingsPage() {
   const addCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!catName.trim()) return;
-    // The database uses a unique slug for stable category references.
     const slug = catName.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
     await supabase.from("blog_categories").insert({ name: catName.trim(), slug });
     setCatName("");
@@ -154,8 +180,6 @@ function SettingsPage() {
     if (!inviteEmail.trim()) return;
     setInviting(true);
     try {
-      // The server function validates the input, checks admin role, and performs
-      // user creation/role assignment with the service-role client.
       const res = await inviteFn({
         data: {
           email: inviteEmail.trim(),
@@ -169,7 +193,8 @@ function SettingsPage() {
       setInviteEmail(""); setInvitePassword("");
       await loadTeam();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Invite failed");
+      if (import.meta.env.DEV) console.error("Could not update team access", err);
+      setError("We couldn't update team access. Please try again or contact support.");
     } finally {
       setInviting(false);
     }
@@ -181,7 +206,8 @@ function SettingsPage() {
       await removeFn({ data: { user_id: row.user_id, role: row.role } });
       await loadTeam();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Remove failed");
+      if (import.meta.env.DEV) console.error("Could not update team access", err);
+      setError("We couldn't update team access. Please try again or contact support.");
     }
   };
 
@@ -190,9 +216,33 @@ function SettingsPage() {
       await changeFn({ data: { user_id: row.user_id, role: next } });
       await loadTeam();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Update failed");
+      if (import.meta.env.DEV) console.error("Could not update team access", err);
+      setError("We couldn't update team access. Please try again or contact support.");
     }
   };
+
+
+  if (adminAccess === "checking") {
+    return <div className="admin-page">Checking access…</div>;
+  }
+
+  if (adminAccess === "error") {
+    return (
+      <div className="admin-page">
+        <h1 className="admin-h1">Unable to verify access</h1>
+        <p>Please refresh the page. If the problem continues, contact support.</p>
+      </div>
+    );
+  }
+
+  if (adminAccess === "denied") {
+    return (
+      <div className="admin-page">
+        <h1 className="admin-h1">Not authorised</h1>
+        <p>Only administrators can manage site settings and team roles.</p>
+      </div>
+    );
+  }
 
 
   return (

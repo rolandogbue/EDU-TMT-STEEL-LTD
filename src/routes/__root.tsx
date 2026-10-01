@@ -17,7 +17,6 @@ import { SiteSettingsProvider } from "@/lib/site-settings";
 import { AuthProvider } from "@/lib/auth-hooks";
 
 function NotFoundComponent() {
-  // Shared fallback for URLs that do not match any file-based route.
   return (
     <>
       <SiteHeader />
@@ -37,7 +36,6 @@ function NotFoundComponent() {
 }
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
-  // Route-level failures are logged here; Retry invalidates loaders and rerenders.
   console.error(error);
   const router = useRouter();
   return (
@@ -62,7 +60,6 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  // Metadata and assets in `head` apply to the document shell during SSR.
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -124,7 +121,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
-  // This outer shell owns the HTML document; route components render inside it.
   return (
     <html lang="en">
       <head>
@@ -141,8 +137,6 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
-  // Providers wrap shared UI and child pages so all routes share query, settings,
-  // and auth state. Keep the Outlet inside these providers.
   return (
     <QueryClientProvider client={queryClient}>
       <SiteSettingsProvider>

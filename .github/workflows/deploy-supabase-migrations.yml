@@ -1,0 +1,53 @@
+name: Supabase migrations
+
+on:
+  workflow_dispatch:
+    inputs:
+      project_ref:
+        description: Supabase project ref to receive reviewed migrations
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  apply-migrations:
+    name: Apply reviewed database migrations
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Confirm target project
+        env:
+          EXPECTED_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+          REQUESTED_PROJECT_REF: ${{ inputs.project_ref }}
+        run: |
+          if [ -z "$EXPECTED_PROJECT_REF" ]; then
+            echo "Set the SUPABASE_PROJECT_REF repository variable first."
+            exit 1
+          fi
+          if [ "$REQUESTED_PROJECT_REF" != "$EXPECTED_PROJECT_REF" ]; then
+            echo "The requested project ref does not match SUPABASE_PROJECT_REF."
+            exit 1
+          fi
+
+      - name: Install Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link to Supabase project
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          SUPABASE_PROJECT_REF: ${{ inputs.project_ref }}
+        run: supabase link --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
+
+      - name: Apply pending migrations
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: supabase db push

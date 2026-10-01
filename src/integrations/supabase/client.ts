@@ -2,13 +2,11 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-// Supabase's newer publishable/secret keys are opaque; the legacy anon key is a JWT.
 function isNewSupabaseApiKey(value: string): boolean {
   return value.startsWith('sb_publishable_') || value.startsWith('sb_secret_');
 }
 
 function createSupabaseFetch(supabaseKey: string): typeof fetch {
-  // New-format keys belong in the `apikey` header, not the bearer-token header.
   return (input, init) => {
     const headers = new Headers(
       typeof Request !== 'undefined' && input instanceof Request ? input.headers : undefined,
@@ -30,25 +28,25 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
 
 
 function createSupabaseClient() {
-  // VITE_ variables are embedded in browser code at build time; process.env is
-  // the server-rendering fallback. Both values are intentionally publishable.
-  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-  const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
+  // Use import.meta.env for client-side (Vite build-time replacement)
+  // Fall back to process.env for SSR (server-side rendering)
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
+  const supabasePublishableKey =
+    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
 
-  if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+  if (!supabaseUrl || !supabasePublishableKey) {
     const missing = [
-      ...(!SUPABASE_URL ? ['SUPABASE_URL'] : []),
-      ...(!SUPABASE_PUBLISHABLE_KEY ? ['SUPABASE_PUBLISHABLE_KEY'] : []),
+      ...(!supabaseUrl ? ['SUPABASE_URL'] : []),
+      ...(!supabasePublishableKey ? ['SUPABASE_PUBLISHABLE_KEY'] : []),
     ];
-    const message = `Missing Supabase environment variable(s): ${missing.join(', ')}. Configure your Supabase project environment variables.`;
+    const message = `Missing Supabase environment variable(s): ${missing.join(', ')}. Copy .env.example to .env and add your Supabase project values.`;
     console.error(`[Supabase] ${message}`);
     throw new Error(message);
   }
 
-  // Persist login state in the browser and refresh expiring access tokens.
-  return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  return createClient<Database>(supabaseUrl, supabasePublishableKey, {
     global: {
-      fetch: createSupabaseFetch(SUPABASE_PUBLISHABLE_KEY),
+      fetch: createSupabaseFetch(supabasePublishableKey),
     },
     auth: {
       persistSession: true,
@@ -57,15 +55,13 @@ function createSupabaseClient() {
   });
 }
 
-// Delay client construction until the first API call so importing this module
-// during server startup does not immediately require browser environment values.
-let _supabase: ReturnType<typeof createSupabaseClient> | undefined;
+let supabaseClient: ReturnType<typeof createSupabaseClient> | undefined;
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 export const supabase = new Proxy({} as ReturnType<typeof createSupabaseClient>, {
   get(_, prop, receiver) {
-    if (!_supabase) _supabase = createSupabaseClient();
-    return Reflect.get(_supabase, prop, receiver);
+    if (!supabaseClient) supabaseClient = createSupabaseClient();
+    return Reflect.get(supabaseClient, prop, receiver);
   },
 });

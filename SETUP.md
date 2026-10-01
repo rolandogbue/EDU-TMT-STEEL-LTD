@@ -1,72 +1,135 @@
-# Self-hosted setup with your own Supabase project
+# Local development and deployment setup
 
-This repository runs the website and server on infrastructure you choose. Supabase provides the database, authentication, and file storage. The app has no hosted-site-builder runtime dependency.
+This guide takes you from a fresh checkout to a local development server. The
+site uses TanStack Start for React routing and server rendering, Supabase for
+database/authentication/storage, GitHub for source control and CI, and Vercel
+for hosting.
 
-## Requirements
+## 1. Install requirements
 
-- Node.js 22 or newer (`.nvmrc` pins the major version).
-- npm (included with Node.js).
-- A Supabase project you own.
+- Node.js 22 (the `.nvmrc` file records the project version)
+- npm 10 or newer
+- A Supabase project you control
 
-## Create and configure Supabase
-
-1. Create a Supabase project and copy its project URL, publishable key, and project reference.
-2. Install the Supabase CLI, then link this repository to your project:
-
-   ```sh
-   npm install --save-dev supabase
-   npx supabase --version
-
-   npx supabase login
-   npx supabase link --project-ref YOUR_PROJECT_REF
-   npx supabase db push
-   ```
-
-   This applies the checked-in schema migrations in `supabase/migrations/` to your project. Review those SQL files before applying them.
-
-3. In Supabase Storage, create a **public** bucket named `site-assets` for logos, favicons, and blog images. The included migrations add access policies for this bucket.
-4. In the `site_settings` table, set the singleton row's `admin_email` to the email address you will use to create the first admin account.
-5. Configure Supabase Auth's site URL and allowed redirect URLs for local development and your production domain.
-
-The migrations create the site's schema and security policies. They do not copy existing content, users, or uploaded files from another Supabase project. Existing Auth users cannot be transferred with their passwords; plan account invitations or password resets as part of a backend migration.
-
-## Configure environment variables
-
-Copy `.env.example` to `.env` and set:
-
-| Variable                        | Used by        | Value                                                           |
-| ------------------------------- | -------------- | --------------------------------------------------------------- |
-| `VITE_SUPABASE_URL`             | Browser bundle | Your Supabase project URL                                       |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | Browser bundle | Your project's publishable key (or legacy anon key)             |
-| `SUPABASE_URL`                  | Server         | Same project URL                                                |
-| `SUPABASE_PUBLISHABLE_KEY`      | Server         | Same publishable key                                            |
-| `SUPABASE_SERVICE_ROLE_KEY`     | Server only    | Service-role/secret key for admin bootstrap and team management |
-
-The publishable key is designed to be public; row-level security protects data access. The service-role key bypasses row-level security and must only be configured as a server secret. Never add it to a `VITE_` variable or commit it.
-
-## Install and run
+Check Node and npm, then install the exact dependencies recorded in the lock
+file:
 
 ```sh
-nvm use          # if using nvm
+node --version
+npm --version
 npm ci
-npm run dev      # http://localhost:8080
 ```
 
-Production commands:
+## 2. Configure Supabase
+
+Create a project in Supabase. Copy the Project URL and publishable key from
+**Project Settings → API**. The publishable key is safe for browser use when
+Row Level Security (RLS) policies are enabled; the service-role key is private.
+
+Copy `.env.example` to `.env` and fill in the URL and publishable key in both
+the browser and server entries. `VITE_` values are embedded in browser code, so
+they must only contain public configuration. Keep `SUPABASE_PUBLISHABLE_KEY`
+equal to the browser's `VITE_SUPABASE_PUBLISHABLE_KEY`; do not put a secret key
+in either publishable-key variable. Team management also requires a server-only
+`SUPABASE_SECRET_KEY` (or the legacy `SUPABASE_SERVICE_ROLE_KEY`).
+
+Apply the schema to your new project using the Supabase CLI:
 
 ```sh
+npx supabase login
+npx supabase link --project-ref YOUR_SUPABASE_PROJECT_REF
+npx supabase migration list --linked
+npx supabase db push
+```
+
+The project ref is the short identifier in your Supabase project URL. The
+migrations create the blog tables, roles, policies, site settings, and storage
+access policies. Review the SQL in `supabase/migrations/` before applying it.
+The timestamp at the beginning of each filename is the migration version; the
+descriptive suffix is only a label. Keep each version unique. If `migration
+list` or `db push` reports mismatched history, stop and compare the local files
+with the remote history before changing anything.
+
+For a disposable remote project that should be rebuilt from these migrations,
+`npx supabase db reset --linked` drops remote user-created database objects and
+replays every local migration. It deletes database data. Do not use it for a
+project whose data must be kept. If the schema is correct but history records
+are wrong, inspect `npx supabase migration repair --help` and repair only the
+specific version after verifying the database state.
+
+Set the first administrator email to the address you will use to sign in by
+updating the `admin_email` value inserted in the initial migration before its
+first application. Then create that user through the site's `/auth` page. Keep
+the service-role key off your computer and out of Git unless you specifically
+need the server-only team-management and admin-bootstrap functions locally.
+
+## 3. Run the website
+
+```sh
+npm run dev
+```
+
+Open <http://localhost:8080>. Sign-in and content-management features require
+the database migrations to have been applied to the configured Supabase
+project.
+
+## 4. Validate changes
+
+```sh
+npm run lint
+npm run typecheck
 npm run build
 npm run preview
 ```
 
-See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for deployment options. This is a server-rendered TanStack Start app; its build is not a static website bundle.
+The production server uses Nitro. Vercel selects its deployment output
+automatically when it builds the project.
 
-## First admin and team management
+## 5. Put the project on GitHub
 
-With your own `SUPABASE_SERVICE_ROLE_KEY` set on the server, the bootstrap endpoint can create the first admin for the email in `site_settings`. Sign in, change the initial password immediately, then manage roles in **Admin → Site settings → Team & roles**. Without the server key, those two account-management features are intentionally unavailable; public pages, blog viewing, sign-in, and blog editing by users who already have a role can still use the publishable key and database policies.
+Create an empty GitHub repository, then push this project:
 
-## Database changes
+```sh
+git init
+git add .
+git commit -m "Prepare EDU TMT Steel for deployment"
+git branch -M main
+git remote add origin https://github.com/YOUR_ACCOUNT/YOUR_REPOSITORY.git
+git push -u origin main
+```
 
-Add future schema changes as new SQL files under `supabase/migrations/`, then review and apply them with `supabase db push`. Do not edit `src/integrations/supabase/types.ts` manually; regenerate it from your linked project when the schema changes.
+The GitHub Actions workflow checks lint, TypeScript, and the production build on
+pull requests and pushes. It uses placeholder Supabase values only for the
+build; no production credentials are required for CI.
 
-For a beginner-friendly map of the routes, Supabase request flow, roles, blog editor, and styles, start with [docs/DEVELOPER_GUIDE.md](docs/DEVELOPER_GUIDE.md).
+## 6. Deploy on Vercel
+
+1. Import the GitHub repository from the Vercel dashboard.
+2. Use the detected framework settings, with `npm ci` as the install command
+   and `npm run build` as the build command.
+3. Add `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`,
+   `VITE_SUPABASE_URL`, and `VITE_SUPABASE_PUBLISHABLE_KEY` for Preview and
+   Production, using the same publishable key for both key variables. Add
+   `SUPABASE_SECRET_KEY` only if you need the protected server-side team and
+   bootstrap features (`SUPABASE_SERVICE_ROLE_KEY` remains supported as a
+   legacy variable).
+4. Deploy. Vercel creates preview deployments for pull requests and production
+   deployments from the production branch.
+
+See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for the GitHub migration workflow,
+environment variable reference, and operational details.
+
+## Naming and code map
+
+- `src/routes/` contains pages and API endpoints; file paths define URLs.
+- `src/components/` contains shared page sections and the admin editor.
+- `src/lib/` contains shared application logic and server functions.
+- `src/integrations/supabase/` contains Supabase clients, auth helpers, and
+  generated database types.
+- `src/styles.css` and `src/styles/` contain the design styles.
+- `supabase/migrations/` contains ordered database changes and access rules.
+
+Database tables and columns use descriptive `snake_case` names. TypeScript
+functions and variables use descriptive `camelCase`; React components and
+types use `PascalCase`. Add comments to explain why a non-obvious decision is
+needed, rather than restating what the next line does.

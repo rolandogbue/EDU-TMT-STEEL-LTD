@@ -10,8 +10,6 @@ interface SitemapEntry {
   priority?: string;
 }
 
-// Search engines fetch this route as XML; URLs are assembled from public pages
-// and published posts so drafts never appear in the sitemap.
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {

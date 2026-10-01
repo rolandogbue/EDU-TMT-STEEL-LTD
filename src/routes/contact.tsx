@@ -3,7 +3,6 @@ import { FiPhone, FiMessageCircle, FiMail, FiMapPin } from "react-icons/fi";
 import { CtaSection } from "@/components/site-sections";
 import { CONTACT } from "@/content/site";
 
-// Contact page metadata and contact methods; shared CTA links use content/site.ts.
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [

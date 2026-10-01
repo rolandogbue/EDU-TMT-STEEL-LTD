@@ -2,10 +2,7 @@ import { PRODUCTS, SERVICES, AUDIENCES, WHY_POINTS, CONTACT, TRUST_POINTS } from
 import { Reveal } from "@/components/reveal";
 import { FiPhone, FiMessageCircle } from "react-icons/fi";
 
-// Presentational components shared by multiple marketing routes. Keep source
-// copy in content/site.ts so layout and editorial updates stay separate.
 export function TrustBar() {
-  // Small credibility points displayed near the top of the homepage.
   return (
     <div className="trust-bar">
       <div className="trust-bar-label">Why Abuja Builds With Us</div>
@@ -30,7 +27,6 @@ export function TrustBar() {
 }
 
 export function ProductsGrid() {
-  // Product cards are generated from the central catalog to keep details consistent.
   return (
     <div className="products-grid">
       {PRODUCTS.map((p, i) => {
@@ -71,7 +67,6 @@ export function ProductsGrid() {
 }
 
 export function ServicesGrid() {
-  // Renders the same service data on both home and services pages.
   return (
     <div className="services-grid">
       {SERVICES.map((s, i) => {
@@ -93,7 +88,6 @@ export function ServicesGrid() {
 }
 
 export function AudienceGrid() {
-  // Presents customer-specific pain points and the matching value proposition.
   return (
     <div className="audience-grid">
       {AUDIENCES.map((a, i) => {
@@ -115,7 +109,6 @@ export function AudienceGrid() {
 }
 
 export function WhySection() {
-  // Editorial split section combining differentiators with market context.
   return (
     <section className="why-section" aria-labelledby="why-title">
       <div className="why-inner">
@@ -164,7 +157,6 @@ export function WhySection() {
 }
 
 export function ProofSection() {
-  // Static proof/commitment block; keep factual claims reviewed when editing.
   return (
     <section className="proof-section" aria-label="Our standard">
       <div className="proof-inner">
@@ -186,7 +178,6 @@ export function ProofSection() {
 }
 
 export function CtaSection() {
-  // Shared contact call-to-action; phone, email, and WhatsApp are centralized.
   return (
     <section id="contact" className="cta-section" aria-labelledby="cta-title">
       <div className="cta-inner">

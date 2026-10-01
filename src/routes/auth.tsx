@@ -14,7 +14,6 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
-// Validate before calling Auth so malformed values get a clear form message.
 const schema = z.object({
   email: z.string().trim().email().max(255),
   password: z.string().min(8).max(72),
@@ -30,7 +29,6 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [bootstrapping, setBootstrapping] = useState(false);
 
-  // Returning visitors with an active session can go straight to the admin area.
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) navigate({ to: "/admin" });
@@ -44,8 +42,6 @@ function AuthPage() {
     if (!parsed.success) { setError(parsed.error.issues[0].message); return; }
     setLoading(true);
     try {
-      // Signup is enabled for the initial admin email; Supabase's database trigger
-      // grants that role. Normal returning users use password sign-in.
       if (mode === "signup") {
         const { error } = await supabase.auth.signUp({
           email: parsed.data.email,
@@ -68,8 +64,6 @@ function AuthPage() {
   const bootstrapAdmin = async () => {
     setError(null); setInfo(null); setBootstrapping(true);
     try {
-      // This server endpoint needs the private service-role key and refuses to
-      // create a second admin. The returned default password must be changed.
       const res = await fetch("/api/public/bootstrap-admin", { method: "POST" });
       const json = (await res.json()) as { ok?: boolean; email?: string; password?: string; error?: string };
       if (!res.ok) setError(json.error ?? "Bootstrap failed");

@@ -12,7 +12,6 @@ import defaultLogo from "@/assets/Logo(Edu).PNG";
  *   export const BRANDING = { logoSrc: myLogo, ... }
  */
 export const BRANDING = {
-  // Change these values to rebrand fallback text/alt text without editing layout.
   logoSrc: defaultLogo as string | null,
   logoAlt: "EDU TMT Steel Limited",
   brandName: "TMT",

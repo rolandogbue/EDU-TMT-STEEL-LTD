@@ -6,8 +6,6 @@ import { supabase } from './client'
 // the browser never attaches the bearer token to serverFn RPCs.
 export const attachSupabaseAuth = createMiddleware({ type: 'function' }).client(
   async ({ next }) => {
-    // Forward the active session token so the matching server middleware can
-    // verify the caller and create an RLS-aware Supabase client.
     const { data } = await supabase.auth.getSession()
     const token = data.session?.access_token
     return next({

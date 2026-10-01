@@ -22,8 +22,6 @@ import zincRoofing from "@/assets/products/zinc-roofing.jpg";
 import marineBoard from "@/assets/products/marine-board.jpg";
 import bindingWire from "@/assets/products/binding-wire.jpg";
 
-// Marketing copy and the matching image/icon choices live here rather than in
-// page markup, making routine content changes easier to review.
 export type Product = {
   image: string;
   icon: IconType;
@@ -79,8 +77,6 @@ export const PRODUCTS: Product[] = [
   },
 ];
 
-// Service copy is separate from products because these describe project support,
-// not inventory. Cards use name/desc/detail in site-sections.tsx.
 export type Service = {
   icon: IconType;
   name: string;
@@ -127,7 +123,6 @@ export const SERVICES: Service[] = [
   },
 ];
 
-// Audience messages tailor the marketing page to the site's main customer groups.
 export type Audience = {
   icon: IconType;
   title: string;
@@ -164,7 +159,6 @@ export const AUDIENCES: Audience[] = [
 
 export type TrustPoint = { icon: IconType; title: string; body: string };
 
-// Compact proof points used in the homepage trust bar.
 export const TRUST_POINTS: TrustPoint[] = [
   { icon: FiTruck, title: "Fast Delivery", body: "Materials delivered across Abuja, fast" },
   { icon: FiClipboard, title: "Free Estimation", body: "Expert material planning" },
@@ -192,7 +186,6 @@ export const WHY_POINTS = [
   },
 ];
 
-// Icon lookup for content blocks that refer to an audience key by name.
 export const AUDIENCE_ICON: Record<string, IconType> = {
   contractors: FiTool,
   developers: FiBriefcase,
@@ -202,7 +195,6 @@ export const AUDIENCE_ICON: Record<string, IconType> = {
   layers: FiLayers,
 };
 
-// Contact values are centralized so CTA/footer links stay consistent.
 export const CONTACT = {
   phone: "+234 803 868 5377",
   phoneHref: "tel:+2348038685377",

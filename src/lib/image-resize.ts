@@ -8,7 +8,6 @@ export type CoverWidth = (typeof COVER_WIDTHS)[number];
 export type ResizedVariant = { width: CoverWidth; blob: Blob };
 
 export async function resizeCoverImage(file: File): Promise<ResizedVariant[]> {
-  // Never upscale small source files; each variant preserves the source ratio.
   const bitmap = await loadBitmap(file);
   const results: ResizedVariant[] = [];
   for (const targetWidth of COVER_WIDTHS) {
@@ -36,8 +35,6 @@ export async function resizeCoverImage(file: File): Promise<ResizedVariant[]> {
 }
 
 async function loadBitmap(file: File): Promise<ImageBitmap> {
-  // Prefer the browser's efficient bitmap decoder, with an Image fallback for
-  // browsers that do not implement createImageBitmap.
   if ("createImageBitmap" in window) {
     return await createImageBitmap(file);
   }
@@ -55,7 +52,6 @@ async function loadBitmap(file: File): Promise<ImageBitmap> {
 }
 
 export function buildSrcSet(srcset: Record<string, string> | null | undefined): string | undefined {
-  // Convert `{ "640": url }` into the HTML `srcSet` syntax expected by <img>.
   if (!srcset) return undefined;
   return Object.entries(srcset)
     .map(([w, url]) => `${url} ${w}w`)

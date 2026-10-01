@@ -15,8 +15,6 @@ type AuthedContext = { supabase: unknown; userId: string };
  * than an opaque 500. See SETUP.md.
  */
 export async function assertAdmin(context: AuthedContext) {
-  // The service key is needed for privileged team operations, but it does not
-  // replace this per-request check of the signed-in caller's admin role.
   assertServiceRoleConfigured();
 
   const { data, error } = await (
