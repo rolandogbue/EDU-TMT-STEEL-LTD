@@ -94,7 +94,7 @@ git init
 git add .
 git commit -m "Prepare EDU TMT Steel for deployment"
 git branch -M main
-git remote add origin https://github.com/YOUR_ACCOUNT/YOUR_REPOSITORY.git
+git remote add origin https://github.com/rolandogbue/EDU-TMT-STEEL-LTD.git
 git push -u origin main
 ```
 
