@@ -48,8 +48,12 @@ export const inviteMember = createServerFn({ method: "POST" })
 
     // Find or create the user
     let userId: string | null = null;
-    const { data: list } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
-    const found = list?.users?.find((u) => u.email?.toLowerCase() === data.email.toLowerCase());
+    const { data: list, error: listError } = await supabaseAdmin.auth.admin.listUsers({
+      page: 1,
+      perPage: 200,
+    });
+    if (listError) throw new Error(listError.message);
+    const found = list.users.find((user) => user.email?.toLowerCase() === data.email.toLowerCase());
     if (found) {
       userId = found.id;
     } else {
