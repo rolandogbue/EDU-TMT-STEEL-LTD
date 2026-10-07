@@ -155,6 +155,7 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        {/* Google Tag Manager */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -166,8 +167,23 @@ function RootShell({ children }: { children: ReactNode }) {
       `,
           }}
         />
+        {/* End Google Tag Manager */}
       </head>
       <body>
+        <body>
+          <noscript>
+            <iframe
+              src="https://www.googletagmanager.com/ns.html?id=GTM-KQPVL3RM"
+              height="0"
+              width="0"
+              style={{ display: "none", visibility: "hidden" }}
+            />
+          </noscript>
+
+          {children}
+          <Analytics />
+          <Scripts />
+        </body>
         {children}
         <Analytics />
         <Scripts />

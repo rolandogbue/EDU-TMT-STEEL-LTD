@@ -208,4 +208,5 @@ export const CONTACT = {
   whatsapp: "https://wa.me/2348038685377",
   email: "contact@edutmtsteel.com",
   location: "Abuja, FCT, Nigeria",
+  address: "Plot 349A, Jikwoyi Residential Layout, Along Nyanya-Karshi Road, Abuja 900108, FCT",
 };

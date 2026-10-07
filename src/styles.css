@@ -50,6 +50,7 @@
 @import "./styles/pages/auth.css";
 @import "./styles/pages/admin.css";
 @import "./styles/pages/blog.css";
+@import "./styles/pages/contact.css";
 
 /* Responsive overrides (must come after the rules it overrides) */
 @import "./styles/responsive.css";

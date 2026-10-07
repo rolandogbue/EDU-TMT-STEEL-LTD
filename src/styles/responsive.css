@@ -64,6 +64,18 @@
   .services-grid {
     grid-template-columns: 1fr;
   }
+  .services-section.contact-channels-section {
+    padding: 80px 32px 56px;
+  }
+  .contact-location-section {
+    padding: 0 32px 80px;
+  }
+  .contact-location-panel {
+    grid-template-columns: 1fr;
+  }
+  .contact-location-copy {
+    padding: 48px;
+  }
   .why-grid {
     grid-template-columns: 1fr;
   }
@@ -181,6 +193,19 @@
   .cta-section,
   .page-hero {
     padding: 60px 20px;
+  }
+  .contact-location-section {
+    padding: 0 20px 60px;
+  }
+  .services-section.contact-channels-section {
+    padding: 60px 20px 44px;
+  }
+  .contact-location-copy {
+    padding: 36px 24px;
+  }
+  .contact-map-frame,
+  .contact-map-frame iframe {
+    min-height: 340px;
   }
   .page-hero {
     padding-top: 120px;

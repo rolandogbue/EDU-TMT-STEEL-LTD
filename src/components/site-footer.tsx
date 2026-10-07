@@ -19,13 +19,13 @@ export function SiteFooter() {
               support, and the reliability your construction project deserves.
             </p>
             <div className="footer-social">
-              <a href="#" aria-label="Facebook" className="social-btn">
+              <a href="https://www.facebook.com/profile.php?id=61590508742462#" aria-label="Facebook" className="social-btn">
                 <FaFacebookF />
               </a>
               <a href="#" aria-label="LinkedIn" className="social-btn">
                 <FaLinkedinIn />
               </a>
-              <a href="#" aria-label="Instagram" className="social-btn">
+              <a href="https://instagram.com/edu_tmt_steel_ltd" aria-label="Instagram" className="social-btn">
                 <FaInstagram />
               </a>
               <a href="#" aria-label="X" className="social-btn">
@@ -109,7 +109,7 @@ export function SiteFooter() {
 
         <div className="footer-bottom">
           <div className="footer-copy">
-            © 2025 <strong>EDU TMT Steel Limited</strong>. All rights reserved.
+            © 2026 <strong>EDU TMT Steel Limited</strong>. All rights reserved.
           </div>
           <div className="footer-tagline-small">Built to Build Abuja.</div>
         </div>
@@ -117,3 +117,9 @@ export function SiteFooter() {
     </footer>
   );
 }
+
+
+
+So does it mean we can't see key events from G-tag?
+
+Also, isn't G-tag the mechanism that transports the events to GA4? Doesn't it mean it should be connected as the source and then delivers to GA4 which later feeds Data Studio?
