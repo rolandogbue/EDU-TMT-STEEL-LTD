@@ -2,12 +2,12 @@ import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { FiMenu, FiX } from "react-icons/fi";
 import { Logo } from "@/components/logo";
-import { useAuth } from "@/lib/auth-hooks";
+import { useOptionalAuth } from "@/lib/auth-hooks";
 
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
-  const { isAdmin } = useAuth();
+  const isAdmin = useOptionalAuth()?.isAdmin ?? false;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);

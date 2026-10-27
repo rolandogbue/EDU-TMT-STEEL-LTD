@@ -17,6 +17,7 @@ import { ScrollToTop } from "@/components/scroll-to-top";
 import { SiteSettingsProvider } from "@/lib/site-settings";
 import { AuthProvider } from "@/lib/auth-hooks";
 import { Analytics } from "@vercel/analytics/react";
+import { absoluteSiteUrl } from "@/config/branding";
 
 function NotFoundComponent() {
   return (
@@ -86,11 +87,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "EDU TMT Steel Limited — Building Materials Supplier in Abuja" },
+      { title: "EDU TMT Steel Limited | Building Materials Supplier in Abuja" },
       {
         name: "description",
         content:
-          "Abuja's trusted building materials partner. TMT rods, BRC wire mesh, cement, roofing sheets and more with fast delivery, expert estimation and 24/7 support.",
+          "EDU TMT Steel supplies TMT rods, BRC mesh, cement, roofing sheets and more across Abuja. Request a free estimate, arrange delivery and reach our team 24/7.",
       },
       { name: "author", content: "EDU TMT Steel Limited" },
       {
@@ -98,11 +99,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "TMT rods Abuja, building materials Nigeria, BRC wire mesh, cement supplier Abuja, steel rods FCT, construction materials Abuja",
       },
-      { property: "og:title", content: "EDU TMT Steel Limited — Built to Build Abuja" },
+      { property: "og:title", content: "EDU TMT Steel Limited | Built to Build Abuja" },
       {
         property: "og:description",
         content:
-          "Premium building materials with complete project support across Abuja and the FCT.",
+          "Building materials, free estimates and project support across Abuja and the FCT.",
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "EDU TMT Steel Limited" },
@@ -126,20 +127,26 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "LocalBusiness",
+          "@id": absoluteSiteUrl("/#business"),
           name: "EDU TMT Steel Limited",
-          image: "",
           description:
-            "Building materials supplier in Abuja: TMT rods, BRC wire mesh, cement, zinc roofing sheets, marine board and binding wire. Fast delivery, expert estimation and 24/7 support.",
+            "Building materials supplier in Abuja: TMT rods, BRC wire mesh, cement, zinc roofing sheets, marine board and binding wire. Delivery, free material estimates, site inspections and 24/7 support.",
+          url: absoluteSiteUrl("/"),
           address: {
             "@type": "PostalAddress",
+            streetAddress: "Plot 349A, Jikwoyi Residential Layout, Along Nyanya-Karshi Road",
             addressLocality: "Abuja",
             addressRegion: "FCT",
+            postalCode: "900108",
             addressCountry: "NG",
           },
-          telephone: "+234-803-868-5377",
+          telephone: "+2348038685377",
           email: "contact@edutmtsteel.com",
-          areaServed: "Abuja, FCT, Nigeria",
-          priceRange: "₦₦",
+          areaServed: "Abuja, Federal Capital Territory, Nigeria",
+          sameAs: [
+            "https://www.facebook.com/profile.php?id=61590508742462",
+            "https://instagram.com/edu_tmt_steel_ltd",
+          ],
         }),
       },
     ],

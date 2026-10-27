@@ -98,7 +98,9 @@ function AdminDashboard() {
       <h1 id="admin-dashboard-title" className="admin-h1">
         Dashboard
       </h1>
-      <p className="admin-lead">Manage your blog, branding and site settings from here.</p>
+      <p className="admin-lead">
+        Manage blog posts here. Administrators can also manage branding and site settings.
+      </p>
 
       {error && (
         <div className="admin-alert error" role="alert">

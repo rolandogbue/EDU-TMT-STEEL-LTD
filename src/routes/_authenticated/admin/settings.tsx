@@ -120,7 +120,8 @@ function SettingsPage() {
       if (kind === "logo") setLogoUrl(data.publicUrl);
       else setFaviconUrl(data.publicUrl);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Upload failed");
+      if (import.meta.env.DEV) console.error("Branding asset upload failed", e);
+      setError("We couldn't upload this file. Please try again.");
     } finally {
       setUploading(null);
     }
@@ -134,8 +135,10 @@ function SettingsPage() {
       .from("site_settings")
       .update({ logo_url: logoUrl, favicon_url: faviconUrl })
       .eq("id", 1);
-    if (error) setError(error.message);
-    else {
+    if (error) {
+      if (import.meta.env.DEV) console.error("Could not save site settings", error);
+      setError("We couldn't save your site settings. Please try again.");
+    } else {
       setMsg("Site settings saved");
       await refresh();
     }
@@ -163,8 +166,10 @@ function SettingsPage() {
       return;
     }
     const { error } = await supabase.auth.updateUser(updates);
-    if (error) setError(error.message);
-    else {
+    if (error) {
+      if (import.meta.env.DEV) console.error("Could not update admin account", error);
+      setError("We couldn't update your account. Please try again.");
+    } else {
       setMsg("Account updated. If you changed your email, check your inbox to confirm.");
       setNewEmail("");
       setNewPassword("");
@@ -392,8 +397,8 @@ function SettingsPage() {
       <section className="admin-section">
         <h2 className="admin-h2">Team &amp; roles</h2>
         <p className="admin-hint">
-          Admins can manage everything. Content managers can create and edit blog posts, categories
-          and tags — but cannot change site settings or team.
+          Admins can manage site settings, team access and all blog content. Content managers can
+          create and edit posts, categories and tags, but cannot change site settings or team access.
         </p>
         {teamError && (
           <div className="admin-alert error" role="alert">

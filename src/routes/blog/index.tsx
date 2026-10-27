@@ -1,9 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { Reveal } from "@/components/reveal";
 import { buildSrcSet } from "@/lib/image-resize";
+import { absoluteSiteUrl } from "@/config/branding";
+import { getBlogDisplayAuthorName } from "@/lib/blog-seo";
 
 const POSTS_PER_PAGE = 9;
 
@@ -13,23 +15,70 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/blog/")({
   validateSearch: searchSchema,
-  head: () => ({
-    meta: [
-      { title: "Blog & Insights | EDU TMT Steel — Construction in Abuja" },
-      {
-        name: "description",
-        content:
-          "Practical guides, project updates and construction insights from EDU TMT Steel — Abuja's trusted building materials partner.",
-      },
-      { property: "og:title", content: "EDU TMT Steel Blog — Building Insights for Abuja" },
-      {
-        property: "og:description",
-        content: "Guides and updates on TMT rods, cement, roofing and construction best practices.",
-      },
-      { property: "og:url", content: "/blog" },
-    ],
-    links: [{ rel: "canonical", href: "/blog" }],
-  }),
+  loaderDeps: ({ search }) => ({ page: search.page }),
+  loader: async ({ deps }) => {
+    const from = (deps.page - 1) * POSTS_PER_PAGE;
+    const to = from + POSTS_PER_PAGE - 1;
+    const { data, count, error } = await supabase
+      .from("blog_posts")
+      .select(
+        "id,title,slug,excerpt,cover_image,cover_image_alt,cover_image_srcset,published_at,author_name",
+        { count: "exact" },
+      )
+      .eq("status", "published")
+      .lte("published_at", new Date().toISOString())
+      .order("published_at", { ascending: false })
+      .range(from, to);
+    if (error?.code === "42703" && error.message.includes("cover_image_alt")) {
+      const fallback = await supabase
+        .from("blog_posts")
+        .select(
+          "id,title,slug,excerpt,cover_image,cover_image_srcset,published_at,author_name",
+          { count: "exact" },
+        )
+        .eq("status", "published")
+        .lte("published_at", new Date().toISOString())
+        .order("published_at", { ascending: false })
+        .range(from, to);
+      if (fallback.error) throw fallback.error;
+      return {
+        posts: (fallback.data ?? []).map((post) => ({ ...post, cover_image_alt: null })) as Post[],
+        total: fallback.count ?? 0,
+        page: deps.page,
+      };
+    }
+    if (error) throw error;
+    return { posts: (data ?? []) as Post[], total: count ?? 0, page: deps.page };
+  },
+  head: ({ loaderData }) => {
+    const page = loaderData?.page ?? 1;
+    const canonical = absoluteSiteUrl(page === 1 ? "/blog" : "/blog?page=" + page);
+    const title =
+      page === 1
+        ? "Construction Guides & Updates in Abuja | EDU TMT Steel"
+        : "Construction Guides & Updates, Page " + page + " | EDU TMT Steel";
+    const description =
+      "Construction material guides and project updates from EDU TMT Steel in Abuja. Read about TMT rods, cement, roofing and building projects.";
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        {
+          property: "og:title",
+          content:
+            page === 1
+              ? "Construction Guides from EDU TMT Steel in Abuja"
+              : title,
+        },
+        {
+          property: "og:description",
+          content: "Guides and updates on TMT rods, cement, roofing and construction in Abuja.",
+        },
+        { property: "og:url", content: canonical },
+      ],
+      links: [{ rel: "canonical", href: canonical }],
+    };
+  },
   component: BlogIndex,
 });
 
@@ -39,6 +88,7 @@ type Post = {
   slug: string;
   excerpt: string | null;
   cover_image: string | null;
+  cover_image_alt: string | null;
   cover_image_srcset: Record<string, string> | null;
   published_at: string;
   author_name: string | null;
@@ -47,31 +97,12 @@ type Post = {
 function BlogIndex() {
   const { page } = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const { posts, total } = Route.useLoaderData();
 
   useEffect(() => {
-    const from = (page - 1) * POSTS_PER_PAGE;
-    const to = from + POSTS_PER_PAGE - 1;
-    setLoading(true);
-    supabase
-      .from("blog_posts")
-      .select("id,title,slug,excerpt,cover_image,cover_image_srcset,published_at,author_name", {
-        count: "exact",
-      })
-      .eq("status", "published")
-      .lte("published_at", new Date().toISOString())
-      .order("published_at", { ascending: false })
-      .range(from, to)
-      .then(({ data, count }) => {
-        setPosts((data ?? []) as Post[]);
-        setTotal(count ?? 0);
-        setLoading(false);
-        if (typeof window !== "undefined" && page > 1) {
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        }
-      });
+    if (typeof window !== "undefined" && page > 1) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   }, [page]);
 
   const totalPages = Math.max(1, Math.ceil(total / POSTS_PER_PAGE));
@@ -83,32 +114,30 @@ function BlogIndex() {
         <div className="page-hero-inner">
           <div className="section-label-light">Blog</div>
           <h1 id="blog-hero" className="page-hero-title">
-            Insights for
+            Construction Guides for
             <br />
             Better <em>Builds.</em>
           </h1>
           <p className="page-hero-sub">
-            Guides, project updates and material knowledge from Abuja's construction frontline.
+            Read our guides and updates on TMT rods, cement, roofing and construction work in Abuja.
           </p>
         </div>
       </section>
 
       <section className="blog-list-section" aria-label="Blog posts">
         <div className="blog-list-inner">
-          {loading ? (
-            <p className="blog-empty">Loading posts…</p>
-          ) : posts.length === 0 ? (
+          {posts.length === 0 ? (
             <p className="blog-empty">
               {page > 1 ? (
                 <>
-                  No posts on this page.{" "}
+                  There are no posts on this page.{" "}
                   <Link to="/blog" search={{ page: 1 }}>
-                    Back to page 1
+                    View the latest posts
                   </Link>
                   .
                 </>
               ) : (
-                "No posts published yet — check back soon."
+                "We haven't published any articles yet. Check back soon."
               )}
             </p>
           ) : (
@@ -123,7 +152,7 @@ function BlogIndex() {
                             src={p.cover_image}
                             srcSet={buildSrcSet(p.cover_image_srcset)}
                             sizes="(max-width: 720px) 100vw, (max-width: 1200px) 50vw, 400px"
-                            alt=""
+                            alt={p.cover_image_alt === null ? p.title : p.cover_image_alt}
                             loading="lazy"
                             decoding="async"
                           />
@@ -140,9 +169,9 @@ function BlogIndex() {
                         </time>
                         <h2 className="blog-card-title">{p.title}</h2>
                         {p.excerpt && <p className="blog-card-excerpt">{p.excerpt}</p>}
-                        {p.author_name && (
-                          <div className="blog-card-author">By {p.author_name}</div>
-                        )}
+                        <div className="blog-card-author">
+                          By {getBlogDisplayAuthorName(p.author_name)}
+                        </div>
                       </div>
                     </Link>
                   </Reveal>
@@ -157,7 +186,7 @@ function BlogIndex() {
                     disabled={page <= 1}
                     aria-label="Previous page"
                   >
-                    ← Prev
+                    ← Previous
                   </button>
                   <ul className="blog-page-list">
                     {pageNumbers.map((n, idx) =>

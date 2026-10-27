@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ServicesGrid, CtaSection } from "@/components/site-sections";
+import { absoluteSiteUrl } from "@/config/branding";
 
 export const Route = createFileRoute("/services")({
   head: () => ({
@@ -8,17 +9,17 @@ export const Route = createFileRoute("/services")({
       {
         name: "description",
         content:
-          "Fast delivery across Abuja, free expert material estimation, on-site inspection, same-day dispatch, 24/7 support and a 100% quality guarantee — all built into every order.",
+          "Building materials delivery in Abuja, free estimates, on-site inspection, same-day dispatch on in-stock items, 24/7 support and a 100% quality guarantee.",
       },
       { property: "og:title", content: "Complete Project Support Services | EDU TMT Steel" },
       {
         property: "og:description",
         content:
-          "We don't just supply. We show up. Full-service building materials support across Abuja.",
+          "Free estimates, on-site inspections and building materials delivery across Abuja.",
       },
-      { property: "og:url", content: "/services" },
+      { property: "og:url", content: absoluteSiteUrl("/services") },
     ],
-    links: [{ rel: "canonical", href: "/services" }],
+    links: [{ rel: "canonical", href: absoluteSiteUrl("/services") }],
   }),
   component: ServicesPage,
 });
@@ -33,9 +34,9 @@ function ServicesPage() {
             We Don't Just Supply. <em>We Show Up.</em>
           </h1>
           <p className="page-hero-sub">
-            No other building materials supplier in Abuja wraps their products in this level of
-            service. From the moment you enquire to the day your materials are on-site and verified
-            — we are with you.
+            Request a free estimate, arrange delivery to your site or ask us to inspect your order
+            on arrival. In-stock items can be dispatched the same day, and our team is available
+            24/7.
           </p>
         </div>
       </section>

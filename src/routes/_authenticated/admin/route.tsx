@@ -4,6 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 
 export const Route = createFileRoute("/_authenticated/admin")({
+  head: () => ({
+    meta: [
+      { title: "Admin Dashboard | EDU TMT Steel" },
+      { name: "robots", content: "noindex,nofollow" },
+    ],
+  }),
   component: AdminLayout,
 });
 

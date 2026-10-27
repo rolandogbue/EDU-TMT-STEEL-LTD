@@ -59,7 +59,12 @@ function AuthPage() {
       }
       navigate({ to: "/admin" });
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Something went wrong");
+      if (import.meta.env.DEV) console.error("Admin account sign-in failed", e);
+      setError(
+        mode === "signin"
+          ? "We couldn't sign you in. Check your email and password, then try again."
+          : "We couldn't create your account. Please check your details and try again.",
+      );
     } finally {
       setLoading(false);
     }
@@ -77,16 +82,19 @@ function AuthPage() {
         password?: string;
         error?: string;
       };
-      if (!res.ok) setError(json.error ?? "Bootstrap failed");
-      else if (json.ok && json.email && json.password) {
+      if (!res.ok) {
+        if (import.meta.env.DEV) console.error("Admin account setup failed", json.error);
+        setError("We couldn't set up the admin account. Please try again or contact support.");
+      } else if (json.ok && json.email && json.password) {
         setEmail(json.email);
         setPassword(json.password);
         setInfo(
           `Default admin created — Email: ${json.email} · Password: ${json.password}. Sign in and change the password immediately.`,
         );
       }
-    } catch {
-      setError("Bootstrap failed");
+    } catch (e) {
+      if (import.meta.env.DEV) console.error("Admin account setup failed", e);
+      setError("We couldn't set up the admin account. Please try again or contact support.");
     } finally {
       setBootstrapping(false);
     }

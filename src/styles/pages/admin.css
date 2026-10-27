@@ -416,6 +416,59 @@
   font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   font-size: 14px;
 }
+.markdown-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--smoke);
+  background: var(--cream);
+}
+.markdown-toolbar button {
+  border: 1px solid var(--smoke);
+  background: var(--white);
+  color: var(--ink);
+  padding: 7px 10px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.markdown-toolbar button:hover,
+.markdown-toolbar button:focus-visible {
+  border-color: var(--orange);
+  color: var(--orange);
+}
+.markdown-toolbar button:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 2px;
+}
+.field-counter {
+  align-self: flex-end;
+  color: var(--mid);
+  font-size: 11px;
+}
+.seo-search-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px;
+  border: 1px solid var(--smoke);
+  background: #fff;
+  color: #4d5156;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.seo-search-preview strong {
+  color: #1a0dab;
+  font-size: 18px;
+  font-weight: 400;
+}
+.seo-preview-url {
+  color: #202124;
+  font-size: 12px;
+}
 .editor-preview {
   background: var(--white);
   border: 1px solid var(--smoke);

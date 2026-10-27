@@ -5,7 +5,7 @@ import { FiPhone, FiMessageCircle } from "react-icons/fi";
 export function TrustBar() {
   return (
     <div className="trust-bar">
-      <div className="trust-bar-label">Why Abuja Builds With Us</div>
+      <div className="trust-bar-label">Support for Builders Across Abuja</div>
       <div className="trust-items">
         {TRUST_POINTS.map((t, i) => {
           const Icon = t.icon;
@@ -140,11 +140,12 @@ export function WhySection() {
           </div>
           <Reveal as="aside" className="why-visual" delay={120}>
             <div className="why-visual-main">
-              <div className="why-visual-big">4.3%</div>
-              <div className="why-visual-label">Nigeria's Construction Growth Rate 2025</div>
+              <div className="why-visual-big">5.53%</div>
+              <div className="why-visual-label">Real Construction GDP Growth, 2025</div>
               <div className="why-visual-note">
-                Abuja leads Nigeria in government and institutional construction demand. EDU TMT is
-                positioned at the centre of this growth.
+                The NBS reported real construction growth of 5.53% in 2025. Put simply, the sector
+                produced more than in 2024 after price changes were factored out; the figure reflects
+                output growth, not just higher prices.
               </div>
             </div>
             <div className="why-supply">
@@ -185,11 +186,11 @@ export function ProofSection() {
           </div>
           <div className="proof-stat-item">
             <div className="proof-stat-num">24/7</div>
-            <div className="proof-stat-label">Always Reachable</div>
+            <div className="proof-stat-label">Support Available</div>
           </div>
           <div className="proof-stat-item">
             <div className="proof-stat-num">Same-Day</div>
-            <div className="proof-stat-label">Fast Delivery Dispatch</div>
+            <div className="proof-stat-label">On In-Stock Items</div>
           </div>
           <div className="proof-stat-item">
             <div className="proof-stat-num">6+</div>

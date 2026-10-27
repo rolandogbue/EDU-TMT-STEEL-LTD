@@ -1,20 +1,24 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AudienceGrid, WhySection, ProofSection, CtaSection } from "@/components/site-sections";
+import { absoluteSiteUrl } from "@/config/branding";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About EDU TMT Steel Limited — Abuja's Materials Partner" },
+      { title: "About EDU TMT Steel Limited | Abuja Building Materials Supplier" },
       {
         name: "description",
         content:
-          "EDU TMT Steel Limited is Abuja's trusted building materials partner — helping contractors, developers, architects and self-builders keep projects moving from foundation to finish.",
+          "Learn about EDU TMT Steel Limited, a building materials supplier in Abuja serving contractors, developers, architects and self-builders across the FCT.",
       },
-      { property: "og:title", content: "About EDU TMT Steel Limited — Abuja's Materials Partner" },
-      { property: "og:description", content: "More than a supplier. A project partner." },
-      { property: "og:url", content: "/about" },
+      { property: "og:title", content: "About EDU TMT Steel Limited | Abuja" },
+      {
+        property: "og:description",
+        content: "Building materials and project support for contractors and builders across Abuja.",
+      },
+      { property: "og:url", content: absoluteSiteUrl("/about") },
     ],
-    links: [{ rel: "canonical", href: "/about" }],
+    links: [{ rel: "canonical", href: absoluteSiteUrl("/about") }],
   }),
   component: AboutPage,
 });
@@ -29,8 +33,8 @@ function AboutPage() {
             More Than a Supplier. <em>A Project Partner.</em>
           </h1>
           <p className="page-hero-sub">
-            Based in Abuja. Trusted by contractors, developers and homebuilders across the FCT.
-            Built to keep your project moving.
+            Based in Jikwoyi, we supply building materials across Abuja and help contractors,
+            developers, architects and homebuilders plan orders and arrange delivery.
           </p>
         </div>
       </section>
@@ -38,30 +42,30 @@ function AboutPage() {
       <section style={{ background: "var(--cream)" }}>
         <div className="about-section">
           <div className="about-left">
-            <div className="about-label">Our Story</div>
+            <div className="about-label">What We Do</div>
             <h2 className="about-title">
-              We Built EDU TMT
-              <em>for builders who can't afford to wait.</em>
+              Materials and support
+              <em>for projects across the FCT.</em>
             </h2>
             <p className="about-body">
-              At <strong>EDU TMT Steel Limited</strong>, we understand that a construction project
-              is never just a shopping list. Delays cost money. Wrong quantities waste budgets.
-              Unreliable suppliers derail timelines — and careers.
+              <strong>EDU TMT Steel Limited</strong> supplies TMT rods, BRC mesh, cement, roofing
+              sheets, marine board and binding wire to projects across Abuja and the FCT. We work
+              with contractors, developers, architects and homebuilders at different stages of a
+              build.
             </p>
             <p className="about-body">
-              That's why we built a company that does more than sell. We{" "}
-              <strong>estimate, deliver, inspect, and support</strong>, so your project keeps moving
-              from foundation to finish. Every order comes with expert estimation, reliable
-              delivery, on-site inspection, and round-the-clock support.
+              We help customers plan quantities with free estimates, arrange delivery and inspect
+              materials on site. Our team is available 24/7, and in-stock items can be dispatched
+              the same day.
             </p>
             <p className="about-body">
-              We live and operate in the same city we serve. We understand your projects, your
-              timelines, and your pressures — because we're in the FCT with you.
+              We are based in Jikwoyi. Call, email or visit us with your material list to discuss
+              what your project needs.
             </p>
             <div className="about-signature">
               <div className="about-sig-line" />
               <div className="about-sig-text">
-                Trusted by contractors, developers &amp; homebuilders across the FCT
+                Serving contractors, developers &amp; homebuilders across the FCT
               </div>
             </div>
           </div>
@@ -73,8 +77,8 @@ function AboutPage() {
                 "We don't just supply your project. We show up for it."
               </div>
               <div className="about-quote-note">
-                This is what it means to have a building materials partner — not just a vendor. It's
-                the standard we hold ourselves to on every order, every delivery, every call.
+                Each order includes help estimating quantities, delivery, on-site inspection and
+                access to our support team 24/7.
               </div>
             </div>
             <div className="about-badge" aria-hidden>

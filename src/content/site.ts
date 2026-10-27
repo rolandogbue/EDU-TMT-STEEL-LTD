@@ -44,7 +44,7 @@ export const PRODUCTS: Product[] = [
     icon: GiMetalBar,
     name: "TMT Rods",
     tag: "★ Flagship Product",
-    desc: "Thermo-Mechanically Treated steel reinforcement bars — the structural backbone of every serious build. Available in multiple grades and diameters (6mm–32mm).",
+    desc: "Thermo-mechanically treated (TMT) reinforcement bars form part of a build's structural frame. Available in multiple grades and diameters from 6mm to 32mm.",
     featured: true,
   },
   {
@@ -52,35 +52,35 @@ export const PRODUCTS: Product[] = [
     icon: GiSteelClaws,
     name: "BRC Wire Mesh",
     tag: "Structural",
-    desc: "High-tensile welded wire mesh for slabs, floors, and reinforced concrete. Consistent spacing, certified strength, ready for immediate site use.",
+    desc: "Welded high-tensile wire mesh for slabs, floors and reinforced concrete. It has consistent spacing, certified strength and is ready for site use.",
   },
   {
     image: cementImg,
     icon: GiBrickWall,
     name: "Cement",
     tag: "Foundation",
-    desc: "Premium-grade cement in bulk or bag quantities. The foundation of every wall, floor and column — supplied consistently and reliably.",
+    desc: "Premium-grade cement in bags or in bulk, supplied consistently. Ask us to estimate the quantity your project needs.",
   },
   {
     image: zincRoofing,
     icon: GiMetalPlate,
     name: "Zinc Roofing Sheets",
     tag: "Roofing",
-    desc: "Durable galvanized zinc sheets engineered to withstand Nigeria's climate. Various profiles and gauges for residential, commercial and industrial builds.",
+    desc: "Durable galvanized zinc roofing sheets, designed to withstand Nigeria's climate. Available in a range of profiles and gauges for homes, commercial buildings and industrial projects.",
   },
   {
     image: marineBoard,
     icon: GiWoodBeam,
     name: "Marine Board",
     tag: "Formwork & Finishing",
-    desc: "High-quality marine plywood for formwork, shuttering and finishing. Moisture-resistant and structurally reliable for casting and interior use.",
+    desc: "Moisture-resistant marine plywood for formwork, shuttering, casting and interior finishing. Structurally reliable for site use.",
   },
   {
     image: bindingWire,
     icon: GiWireCoil,
     name: "Binding Wire",
     tag: "Fixing",
-    desc: "Annealed steel binding wire for tying rebar and reinforcement mesh. The essential connecting material on every reinforced concrete build — always in stock.",
+    desc: "Annealed steel binding wire for tying reinforcement bars and mesh. An essential material for reinforced concrete work, always in stock.",
   },
 ];
 
@@ -95,38 +95,38 @@ export const SERVICES: Service[] = [
   {
     icon: FiTruck,
     name: "Fast Delivery",
-    desc: "Swift, reliable delivery of your materials across Abuja. Dispatched promptly, handled with care, and tracked straight to your site — no logistics headache, no third-party delays.",
-    detail: "Same-day dispatch on stock items",
+    desc: "We deliver promptly to sites across Abuja, handle materials with care and keep each order tracked on the way.",
+    detail: "Same-day dispatch on in-stock items",
   },
   {
     icon: FiClipboard,
     name: "Material Estimation",
-    desc: "Expert consultation and accurate material quantity estimation — completely free. Know exactly what you need before you spend a naira. Prevents overbuy, underbuy and budget waste.",
+    desc: "Send us your project details for a free estimate of the quantities you need. Planning ahead can help you avoid ordering too much or running short.",
     detail: "Free for all clients",
   },
   {
     icon: FiMapPin,
     name: "Site Inspection",
-    desc: "On-site quality inspection and material verification by our experts. We don't just deliver — we verify. Your site, our eyes, your peace of mind.",
+    desc: "Our team inspects materials at your site and checks the delivery against your order.",
     detail: "On-site quality assurance",
   },
   {
     icon: FiZap,
     name: "Quick Turnaround",
-    desc: "Same-day dispatch for all in-stock items. Your project timeline is non-negotiable — ours matches it. We move as fast as your build demands.",
-    detail: "Same-day dispatch on stock items",
+    desc: "We dispatch in-stock items the same day to help keep materials moving on your project.",
+    detail: "Same-day dispatch on in-stock items",
   },
   {
     icon: FiShield,
     name: "Quality Guarantee",
-    desc: "100% quality assurance with a replacement guarantee on all materials. If it doesn't meet standard, we answer for it — no arguments, no delays.",
-    detail: "100% backed guarantee",
+    desc: "Our 100% quality guarantee covers replacement if any material fails to meet the stated standard.",
+    detail: "Replacement guarantee on all materials",
   },
   {
     icon: FiPhoneCall,
     name: "24/7 Support",
-    desc: "Round-the-clock customer support for urgent material requirements. Construction doesn't wait for business hours. Neither do we. Call at 3am — we pick up.",
-    detail: "Always reachable",
+    desc: "Call any time for help with urgent material needs. Our support team is available 24/7.",
+    detail: "Support available 24/7",
   },
 ];
 
@@ -141,55 +141,55 @@ export const AUDIENCES: Audience[] = [
   {
     icon: FiTool,
     title: "Contractors & Site Managers",
-    pain: "You can't afford site stoppages. Material shortages and quality failures cost you client relationships and project reputation.",
-    msg: '"Never stall a site over materials again. We\'re stocked, we deliver same-day, and we answer at 3am."',
+    pain: "A shortage or quality issue can hold up work and put the schedule, budget and client relationship at risk.",
+    msg: "We offer same-day dispatch on in-stock items, and our support team is available 24/7.",
   },
   {
     icon: FiBriefcase,
     title: "Real Estate Developers",
-    pain: "Coordinating bulk procurement across multiple units, managing cost overruns, and maintaining consistent material quality is complex.",
-    msg: '"Bulk orders. Fast delivery. Expert estimation. We\'re the supply partner serious developers build relationships with."',
+    pain: "Coordinating bulk orders across several units while managing costs and material quality takes careful planning.",
+    msg: "We can estimate quantities and coordinate bulk orders and delivery through one supplier.",
   },
   {
     icon: FiHome,
     title: "Self-Build Homeowners",
-    pain: "You're making the biggest investment of your life. You don't know exactly what to buy, and you're afraid of being overcharged or undersupplied.",
-    msg: '"Don\'t guess. Our estimation experts calculate exactly what your project needs. The consultation is free."',
+    pain: "When you're managing a home build, it can be hard to know what to buy and how much. You want to avoid over-ordering, running short or spending more than planned.",
+    msg: "Ask for a free estimate of the quantities your build needs before you place an order.",
   },
   {
     icon: FiEdit3,
     title: "Architects & QS Professionals",
-    pain: "The supplier you recommend reflects on your professional reputation. Underperforming vendors make you look bad to your clients.",
-    msg: '"When you refer a client to EDU TMT, your reputation stays intact. We supply to spec, every time."',
+    pain: "Your supplier reflects on the recommendation you make. You need materials that meet specification and service that follows through.",
+    msg: "We supply to specification and support your clients with estimates, site inspections and delivery.",
   },
 ];
 
 export type TrustPoint = { icon: IconType; title: string; body: string };
 
 export const TRUST_POINTS: TrustPoint[] = [
-  { icon: FiTruck, title: "Fast Delivery", body: "Materials delivered across Abuja, fast" },
-  { icon: FiClipboard, title: "Free Estimation", body: "Expert material planning" },
-  { icon: FiZap, title: "Same-Day Dispatch", body: "In-stock items ship the same day" },
-  { icon: FiShield, title: "Quality Guarantee", body: "100% backed with replacement assurance" },
-  { icon: FiPhoneCall, title: "24/7 Support", body: "Available for urgent material needs" },
+  { icon: FiTruck, title: "Fast Delivery", body: "To project sites across Abuja" },
+  { icon: FiClipboard, title: "Free Estimation", body: "Plan the quantities your project needs" },
+  { icon: FiZap, title: "Same-Day Dispatch", body: "For in-stock items" },
+  { icon: FiShield, title: "Quality Guarantee", body: "Replacement if materials don't meet the stated standard" },
+  { icon: FiPhoneCall, title: "24/7 Support", body: "Call our team at any time" },
 ];
 
 export const WHY_POINTS = [
   {
-    title: "Structural Authority",
-    body: "Our TMT rods literally hold buildings up. Every product we stock inherits that same standard of quality and engineering trust.",
+    title: "Materials for Every Stage",
+    body: "Source TMT rods, BRC mesh, cement, roofing sheets, marine board and binding wire from one Abuja supplier.",
   },
   {
-    title: "Full Project Support",
-    body: "Free estimation, site inspection, same-day dispatch, 24/7 support. No competitor in Abuja offers this complete package under one name.",
+    title: "Plan Before You Order",
+    body: "Get a free estimate based on your project, so you can budget for the quantities you need and avoid ordering too much or running short.",
   },
   {
-    title: "Supply You Can Count On",
-    body: "In a volatile market, reliability is a premium product. When you call, we have stock. When you need it, we deliver.",
+    title: "Delivery and Site Checks",
+    body: "We arrange delivery across Abuja and can inspect materials at your site against your order.",
   },
   {
-    title: "Abuja-Rooted, Builder-Focused",
-    body: "We live and operate in the same city we serve. We understand your projects, your timelines, and your pressures.",
+    title: "Support When You Need It",
+    body: "Our team is available 24/7 for urgent material needs. In-stock items can be dispatched the same day.",
   },
 ];
 

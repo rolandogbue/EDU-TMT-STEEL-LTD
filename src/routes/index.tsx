@@ -9,24 +9,25 @@ import {
   CtaSection,
 } from "@/components/site-sections";
 import { CONTACT } from "@/content/site";
+import { absoluteSiteUrl } from "@/config/branding";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "EDU TMT Steel Limited — Building Materials Supplier in Abuja" },
+      { title: "EDU TMT Steel Limited | Building Materials Supplier in Abuja" },
       {
         name: "description",
         content:
-          "Abuja's trusted building materials partner. TMT rods, cement, BRC wire mesh, roofing sheets and more with fast delivery, free estimation and 24/7 support.",
+          "EDU TMT Steel supplies TMT rods, BRC mesh, cement, roofing sheets and more across Abuja. Request a free estimate, arrange delivery and reach our team 24/7.",
       },
-      { property: "og:title", content: "EDU TMT Steel Limited — Built to Build Abuja" },
+      { property: "og:title", content: "EDU TMT Steel Limited | Built to Build Abuja" },
       {
         property: "og:description",
-        content: "Premium building materials with complete project support across Abuja.",
+        content: "Building materials, free estimates and project support across Abuja.",
       },
-      { property: "og:url", content: "/" },
+      { property: "og:url", content: absoluteSiteUrl("/") },
     ],
-    links: [{ rel: "canonical", href: "/" }],
+    links: [{ rel: "canonical", href: absoluteSiteUrl("/") }],
   }),
   component: Index,
 });
@@ -64,8 +65,8 @@ function Index() {
               <span>Abuja.</span>
             </h1>
             <p className="hero-subhead">
-              Premium TMT rods, cement, roofing and more — backed by free estimation, fast delivery,
-              and round-the-clock support. The materials partner serious builders call first.
+              We supply TMT rods, cement, roofing sheets and more to projects across Abuja. Request
+              a free material estimate, arrange delivery and reach our team 24/7 for support.
             </p>
             <div className="hero-actions">
               <a href={CONTACT.phoneHref} className="btn-primary">
@@ -90,7 +91,7 @@ function Index() {
               </div>
               <div className="hero-stat">
                 <div className="hero-stat-num">Same-Day</div>
-                <div className="hero-stat-label">Fast Delivery Dispatch</div>
+                <div className="hero-stat-label">Dispatch on In-Stock Items</div>
               </div>
               <div className="hero-stat">
                 <div className="hero-stat-num">100%</div>
@@ -123,20 +124,18 @@ function Index() {
               <em>a Materials Supplier.</em>A Project Partner.
             </h2>
             <p className="about-body">
-              At <strong>EDU TMT Steel Limited</strong>, we understand that a construction project
-              is never just a shopping list. Delays cost money. Wrong quantities waste budgets.
-              Unreliable suppliers derail timelines — and careers.
+              A site can lose time when materials arrive late or quantities fall short. EDU TMT
+              helps you plan the order, source the materials and arrange delivery to your site.
             </p>
             <p className="about-body">
-              That's why we built a company that does more than sell. We{" "}
-              <strong>estimate, deliver, inspect, and support</strong>, so your project keeps moving
-              from foundation to finish. Based in Abuja and proud of it, we are the partner serious
-              builders call first.
+              <strong>EDU TMT Steel Limited</strong> supplies building materials across Abuja and
+              the FCT, and offers free estimates, site inspections, fast delivery and 24/7 support.
+              We work with you to ensure your project is completed on time and within budget.
             </p>
             <div className="about-signature">
               <div className="about-sig-line" />
               <div className="about-sig-text">
-                Trusted by contractors, developers &amp; homebuilders across the FCT
+                Serving contractors, developers &amp; homebuilders across the FCT
               </div>
             </div>
           </div>
@@ -148,9 +147,8 @@ function Index() {
                 "We don't just supply your project. We show up for it."
               </div>
               <div className="about-quote-note">
-                Every order at EDU TMT comes with expert estimation, reliable delivery, on-site
-                inspection, and round-the-clock support. This is what it means to have a building
-                materials partner — not just a vendor.
+                From a free material estimate to delivery and on-site inspection, our team helps you
+                plan the order and get supplies to your project.
               </div>
             </div>
             <div className="about-badge" aria-hidden>
@@ -173,8 +171,8 @@ function Index() {
               </h2>
             </div>
             <div className="section-header-right">
-              All products are sourced to standard and backed by our quality guarantee. Whether
-              you're breaking ground or finishing strong, we have what your project needs.
+              We source each product to standard and back it with our replacement guarantee. Browse
+              TMT rods, BRC wire mesh, cement, roofing sheets, marine board and binding wire.
             </div>
           </div>
           <ProductsGrid />
@@ -195,9 +193,9 @@ function Index() {
               </h2>
             </div>
             <div className="services-desc">
-              No other building materials supplier in Abuja wraps their products in this level of
-              service. From the moment you enquire to the day your materials are on-site and
-              verified — we are with you.
+              Request a free material estimate, arrange delivery to your site or ask us to inspect
+              your order on arrival. In-stock items can be dispatched the same day, and our team is
+              available 24/7.
             </div>
           </div>
           <ServicesGrid />

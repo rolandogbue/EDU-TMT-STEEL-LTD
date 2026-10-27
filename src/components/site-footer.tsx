@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { FaFacebookF, FaLinkedinIn, FaInstagram, FaXTwitter, FaWhatsapp } from "react-icons/fa6";
+import { FaFacebookF, FaInstagram, FaWhatsapp } from "react-icons/fa6";
 import { Logo } from "@/components/logo";
 
 export function SiteFooter() {
@@ -15,19 +15,16 @@ export function SiteFooter() {
               Build Abuja.
             </div>
             <p className="footer-bio">
-              Abuja's foremost building materials partner. Premium products, complete project
-              support, and the reliability your construction project deserves.
+              We supply building materials across Abuja, with free estimates, on-site inspections,
+              delivery and 24/7 support.
             </p>
             <div className="footer-social">
               <a
-                href="https://www.facebook.com/profile.php?id=61590508742462#"
+                href="https://www.facebook.com/profile.php?id=61590508742462"
                 aria-label="Facebook"
                 className="social-btn"
               >
                 <FaFacebookF />
-              </a>
-              <a href="#" aria-label="LinkedIn" className="social-btn">
-                <FaLinkedinIn />
               </a>
               <a
                 href="https://instagram.com/edu_tmt_steel_ltd"
@@ -35,9 +32,6 @@ export function SiteFooter() {
                 className="social-btn"
               >
                 <FaInstagram />
-              </a>
-              <a href="#" aria-label="X" className="social-btn">
-                <FaXTwitter />
               </a>
               <a href="https://wa.me/2348038685377" aria-label="WhatsApp" className="social-btn">
                 <FaWhatsapp />
@@ -119,7 +113,7 @@ export function SiteFooter() {
           <div className="footer-copy">
             {/* © 2026 <strong>EDU TMT Steel Limited</strong>. All rights reserved. */}
             &#x00A9;2026 - EDU TMT STEEL LIMITED. All rights reserved | Designed by{" "}
-            <a href="https://www.mcraytechservices.com" target="_blank">
+            <a href="https://www.mcraytechservices.com" target="_blank" rel="noreferrer">
               MCRAY TECH SERVICES LTD.
             </a>
           </div>

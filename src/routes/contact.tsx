@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { FiPhone, FiMessageCircle, FiMail, FiMapPin } from "react-icons/fi";
 import { CtaSection } from "@/components/site-sections";
 import { CONTACT } from "@/content/site";
+import { absoluteSiteUrl } from "@/config/branding";
 
 const GOOGLE_MAPS_EMBED_URL = [
   "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15763.946696750003!2d7.536012755419925!3d8.973372500000004",
@@ -20,17 +21,17 @@ export const Route = createFileRoute("/contact")({
       {
         name: "description",
         content:
-          "Call, WhatsApp, or visit EDU TMT Steel Limited at Plot 349A, Jikwoyi, Abuja for quotes, free material estimation, and building materials.",
+          "Contact EDU TMT Steel in Jikwoyi, Abuja for building materials, quotes and free estimates. Call or WhatsApp +234 803 868 5377, or visit our office.",
       },
       { property: "og:title", content: "Contact EDU TMT Steel Limited — Abuja" },
       {
         property: "og:description",
         content:
-          "Get a quote, request a free estimate, or arrange delivery. We're ready when you are.",
+          "Call, WhatsApp or email EDU TMT Steel for a quote or free estimate, or visit us in Jikwoyi, Abuja.",
       },
-      { property: "og:url", content: "/contact" },
+      { property: "og:url", content: absoluteSiteUrl("/contact") },
     ],
-    links: [{ rel: "canonical", href: "/contact" }],
+    links: [{ rel: "canonical", href: absoluteSiteUrl("/contact") }],
   }),
   component: ContactPage,
 });
@@ -45,8 +46,8 @@ function ContactPage() {
             Let's Start <em>Your Project.</em>
           </h1>
           <p className="page-hero-sub">
-            Call. WhatsApp. Email. Walk in. Whatever works for you — we're reachable, and we're
-            ready.
+            Call, WhatsApp or email us for a quote. You can also visit us in Jikwoyi or use Google
+            Maps to plan your route.
           </p>
         </div>
       </section>
@@ -59,8 +60,8 @@ function ContactPage() {
             </div>
             <h2 className="service-name">Call Us</h2>
             <p className="service-desc">
-              Talk to a real person 24/7. We pick up whether you need a quote, estimation help, or
-              an urgent same-day delivery.
+              Call any time for a quote, help estimating quantities or an urgent order. Our support
+              team is available 24/7; same-day dispatch applies to in-stock items.
             </p>
             <div className="service-detail">{CONTACT.phone}</div>
           </a>
@@ -71,8 +72,8 @@ function ContactPage() {
             </div>
             <h2 className="service-name">WhatsApp Us</h2>
             <p className="service-desc">
-              Share your material list, get pricing, and confirm delivery — all over WhatsApp.
-              Fastest way to get a quote back.
+              Send us your material list to ask about pricing and delivery. WhatsApp is a convenient
+              way to request a quote.
             </p>
             <div className="service-detail">Chat now</div>
           </a>
@@ -87,8 +88,8 @@ function ContactPage() {
             </div>
             <h2 className="service-name">Email Us</h2>
             <p className="service-desc">
-              Send your BOQ, drawings, or project brief. Our estimation team will come back with a
-              full material breakdown.
+              Email your BOQ, drawings or project brief. Our estimation team can prepare a full
+              material breakdown for your review.
             </p>
             <div className="service-detail">{CONTACT.email}</div>
           </a>
@@ -105,7 +106,7 @@ function ContactPage() {
             </div>
             <h2 className="service-name">Visit Us</h2>
             <p className="service-desc">
-              Visit our Jikwoyi location or open Google Maps to get directions from where you are.
+              Find us in Jikwoyi, or open Google Maps for directions from your location.
             </p>
             <div className="service-detail">Plot 349A, Jikwoyi, Abuja</div>
           </a>
@@ -120,8 +121,8 @@ function ContactPage() {
               Visit us in <span>Jikwoyi.</span>
             </h2>
             <p className="contact-location-description">
-              Come by our Abuja location or get directions to plan your visit. We also deliver
-              building materials across Abuja and the FCT.
+              Visit us in Jikwoyi or use the map to plan your route. We deliver building materials
+              to project sites across Abuja and the FCT.
             </p>
             <div className="contact-location-address">
               <span className="contact-location-address-label">Our address</span>

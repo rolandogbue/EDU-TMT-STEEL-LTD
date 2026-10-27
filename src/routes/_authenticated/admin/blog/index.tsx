@@ -34,7 +34,7 @@ function BlogList() {
   }, [load]);
 
   const remove = async (id: string) => {
-    if (!confirm("Delete this post? This cannot be undone.")) return;
+    if (!confirm("Delete this post? You can't undo this.")) return;
     await supabase.from("blog_posts").delete().eq("id", id);
     load();
   };

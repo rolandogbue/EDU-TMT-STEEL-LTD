@@ -74,6 +74,11 @@ been reviewed. The workflow requires the selected ref to equal the configured
 project ref, which helps prevent applying production migrations to the wrong
 project.
 
+When application code reads a newly added column, deploy that schema change
+first. For the blog cover-image description column, push the migration file on
+its own, run the migration workflow, then push the application changes. A push
+to `main` can deploy through Vercel before a manually triggered migration runs.
+
 Before migration deployment, make sure local and remote versions agree. A
 linked reset (`supabase db reset --linked`) destroys remote user-created
 database objects and data before replaying local migrations. Use it only for a

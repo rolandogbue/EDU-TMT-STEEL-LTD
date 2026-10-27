@@ -61,3 +61,10 @@ export function useAuth(): AuthContextValue {
   if (!context) throw new Error("useAuth must be used within AuthProvider.");
   return context;
 }
+
+/** Returns auth state when available, for shared UI rendered by router boundaries. */
+// This hook lives beside the provider so both can share a private context.
+// eslint-disable-next-line react-refresh/only-export-components
+export function useOptionalAuth(): AuthContextValue | undefined {
+  return useContext(AuthContext);
+}

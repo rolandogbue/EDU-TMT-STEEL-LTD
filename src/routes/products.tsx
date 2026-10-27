@@ -1,24 +1,25 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ProductsGrid, CtaSection } from "@/components/site-sections";
+import { absoluteSiteUrl } from "@/config/branding";
 
 export const Route = createFileRoute("/products")({
   head: () => ({
     meta: [
-      { title: "Building Materials & TMT Rods in Abuja | EDU TMT Steel" },
+      { title: "Building Materials in Abuja | TMT Rods & More | EDU TMT Steel" },
       {
         name: "description",
         content:
-          "Explore our range: TMT rods (6mm–32mm), BRC wire mesh, cement, zinc roofing sheets, marine board and binding wire. Sourced to standard, backed by our quality guarantee.",
+          "TMT rods (6mm–32mm), BRC wire mesh, cement, zinc roofing sheets, marine board and binding wire in Abuja, all covered by our replacement guarantee.",
       },
-      { property: "og:title", content: "Building Materials & TMT Rods in Abuja | EDU TMT Steel" },
+      { property: "og:title", content: "Building Materials in Abuja | EDU TMT Steel" },
       {
         property: "og:description",
         content:
-          "Premium construction materials for contractors, developers and self-builders across Abuja.",
+          "TMT rods, cement, BRC mesh, roofing sheets and other materials for Abuja projects.",
       },
-      { property: "og:url", content: "/products" },
+      { property: "og:url", content: absoluteSiteUrl("/products") },
     ],
-    links: [{ rel: "canonical", href: "/products" }],
+    links: [{ rel: "canonical", href: absoluteSiteUrl("/products") }],
   }),
   component: ProductsPage,
 });
@@ -35,9 +36,9 @@ function ProductsPage() {
             for <em>Every</em> Build.
           </h1>
           <p className="page-hero-sub">
-            Six core product categories, always in stock. Every item is sourced to standard and
-            backed by our replacement guarantee — the same trust our TMT rods carry into your
-            foundation.
+            Our six core product categories are always in stock. Each is sourced to standard and
+            covered by our replacement guarantee. Choose TMT rods, BRC mesh, cement, roofing sheets,
+            marine board or binding wire for your project.
           </p>
         </div>
       </section>

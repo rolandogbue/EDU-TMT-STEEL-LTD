@@ -1,11 +1,17 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { COVER_WIDTHS, buildSrcSet, resizeCoverImage } from "@/lib/image-resize";
+import { BLOG_SEO_LIMITS, getBlogSeoDescription, getBlogSeoTitle } from "@/lib/blog-seo";
 
 type Category = { id: string; name: string };
 type Status = "draft" | "published" | "scheduled";
+
+const isMissingCoverImageAltColumn = (error: { code?: string; message?: string } | null) =>
+  !!error &&
+  (error.code === "42703" || error.code === "PGRST204") &&
+  (error.message?.includes("cover_image_alt") ?? false);
 
 const slugify = (s: string) =>
   s
@@ -35,6 +41,7 @@ export function PostEditor({
   const [msg, setMsg] = useState<string | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [preview, setPreview] = useState(false);
+  const bodyRef = useRef<HTMLTextAreaElement>(null);
 
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
@@ -42,6 +49,7 @@ export function PostEditor({
   const [excerpt, setExcerpt] = useState("");
   const [body, setBody] = useState("");
   const [coverImage, setCoverImage] = useState<string>("");
+  const [coverImageAlt, setCoverImageAlt] = useState("");
   const [coverSrcset, setCoverSrcset] = useState<Record<string, string> | null>(null);
   const [coverUploading, setCoverUploading] = useState(false);
 
@@ -90,6 +98,7 @@ export function PostEditor({
         setExcerpt(post.excerpt ?? "");
         setBody(post.body ?? "");
         setCoverImage(post.cover_image ?? "");
+        setCoverImageAlt(post.cover_image_alt ?? "");
         setCoverSrcset((post.cover_image_srcset as Record<string, string> | null) ?? null);
 
         const loadedStatus = (post.status as Status) ?? "draft";
@@ -121,6 +130,7 @@ export function PostEditor({
   const uploadCover = useCallback(async (file: File) => {
     setError(null);
     setCoverUploading(true);
+    setCoverImageAlt("");
     try {
       const variants = await resizeCoverImage(file);
       const folder = `blog/${crypto.randomUUID()}`;
@@ -152,25 +162,80 @@ export function PostEditor({
       .map((t) => t.trim())
       .filter(Boolean);
     if (!names.length) {
-      await supabase.from("blog_post_tags").delete().eq("post_id", postId);
+      const { error } = await supabase.from("blog_post_tags").delete().eq("post_id", postId);
+      if (error) throw error;
       return;
     }
     // Upsert tags
     const tagRows = names.map((n) => ({ name: n, slug: slugify(n) }));
-    await supabase
+    const { error: tagError } = await supabase
       .from("blog_tags")
       .upsert(tagRows, { onConflict: "slug", ignoreDuplicates: true });
-    const { data: existing } = await supabase
+    if (tagError) throw tagError;
+    const { data: existing, error: selectError } = await supabase
       .from("blog_tags")
       .select("id,slug")
       .in("slug", names.map(slugify));
+    if (selectError) throw selectError;
     const ids = (existing ?? []).map((t) => t.id);
-    await supabase.from("blog_post_tags").delete().eq("post_id", postId);
+    const { error: deleteError } = await supabase
+      .from("blog_post_tags")
+      .delete()
+      .eq("post_id", postId);
+    if (deleteError) throw deleteError;
     if (ids.length) {
-      await supabase
+      const { error: insertError } = await supabase
         .from("blog_post_tags")
         .insert(ids.map((tag_id) => ({ post_id: postId, tag_id })));
+      if (insertError) throw insertError;
     }
+  };
+
+  const insertMarkdown = (
+    prefix: string,
+    suffix = "",
+    placeholder = "text",
+    prefixEachLine = false,
+  ) => {
+    const textarea = bodyRef.current;
+    const start = textarea?.selectionStart ?? body.length;
+    const end = textarea?.selectionEnd ?? body.length;
+    const selectedText = body.slice(start, end);
+    const textToFormat = selectedText || placeholder;
+    const formattedText = prefixEachLine
+      ? textToFormat
+          .split("\n")
+          .map((line) => prefix + line)
+          .join("\n")
+      : prefix + textToFormat + suffix;
+    const nextBody = body.slice(0, start) + formattedText + body.slice(end);
+    setBody(nextBody);
+
+    const selectionStart = prefixEachLine ? start + formattedText.length : start + prefix.length;
+    const selectionEnd = prefixEachLine
+      ? selectionStart
+      : selectionStart + textToFormat.length;
+    requestAnimationFrame(() => {
+      const input = bodyRef.current;
+      if (!input) return;
+      input.focus();
+      input.setSelectionRange(selectionStart, selectionEnd);
+    });
+  };
+
+  const insertSnippet = (snippet: string) => {
+    const textarea = bodyRef.current;
+    const start = textarea?.selectionStart ?? body.length;
+    const end = textarea?.selectionEnd ?? body.length;
+    const nextBody = body.slice(0, start) + snippet + body.slice(end);
+    setBody(nextBody);
+    const caret = start + snippet.length;
+    requestAnimationFrame(() => {
+      const input = bodyRef.current;
+      if (!input) return;
+      input.focus();
+      input.setSelectionRange(caret, caret);
+    });
   };
 
   const save = async () => {
@@ -180,9 +245,21 @@ export function PostEditor({
       setError("Title is required");
       return;
     }
-    const finalSlug = slug.trim() || slugify(title);
+    const finalSlug = slugify(slug.trim() || title);
     if (!finalSlug) {
       setError("A URL slug is required");
+      return;
+    }
+    if (status !== "draft" && !body.trim()) {
+      setError("Add the article content before publishing or scheduling it.");
+      return;
+    }
+    if (status !== "draft" && !excerpt.trim()) {
+      setError("Add a short summary so readers can see what the article covers.");
+      return;
+    }
+    if (status !== "draft" && coverImage && !coverImageAlt.trim()) {
+      setError("Add a short description of the cover image before publishing.");
       return;
     }
     const scheduledDate = status === "scheduled" && publishedAt ? new Date(publishedAt) : null;
@@ -203,6 +280,7 @@ export function PostEditor({
         excerpt: excerpt.trim().slice(0, 400) || null,
         body,
         cover_image: coverImage || null,
+        cover_image_alt: coverImage ? coverImageAlt.trim().slice(0, 180) : null,
         cover_image_srcset: coverSrcset,
 
         status,
@@ -220,30 +298,54 @@ export function PostEditor({
         seo_description: seoDescription.trim().slice(0, 160) || null,
         category_id: categoryId || null,
         author_id: userData.user?.id ?? null,
-        author_name: authorName.trim().slice(0, 80) || userData.user?.email || null,
+        author_name: authorName.trim().slice(0, 80) || null,
       };
+      const {
+        cover_image_alt: coverImageAltValue,
+        ...payloadWithoutCoverImageAlt
+      } = payload;
+      let coverImageAltWasNotSaved = false;
       let id = postId;
       if (id) {
-        const { error } = await supabase.from("blog_posts").update(payload).eq("id", id);
-        if (error) throw error;
+        let result = await supabase.from("blog_posts").update(payload).eq("id", id);
+        if (isMissingCoverImageAltColumn(result.error)) {
+          result = await supabase
+            .from("blog_posts")
+            .update(payloadWithoutCoverImageAlt)
+            .eq("id", id);
+          coverImageAltWasNotSaved = Boolean(coverImageAltValue);
+        }
+        if (result.error) throw result.error;
       } else {
-        const { data, error } = await supabase
+        let result = await supabase
           .from("blog_posts")
           .insert(payload)
           .select("id")
           .single();
-        if (error) throw error;
-        id = data.id;
+        if (isMissingCoverImageAltColumn(result.error)) {
+          result = await supabase
+            .from("blog_posts")
+            .insert(payloadWithoutCoverImageAlt)
+            .select("id")
+            .single();
+          coverImageAltWasNotSaved = Boolean(coverImageAltValue);
+        }
+        if (result.error) throw result.error;
+        id = result.data.id;
       }
       if (id) await upsertTags(id, tags);
       setOriginalStatus(status);
       setOriginalPublishedAt(payload.published_at);
-      setMsg(
+      const savedMessage =
         status === "draft"
           ? "Draft saved."
           : status === "scheduled"
             ? "Post scheduled."
-            : "Post published.",
+            : "Post published.";
+      setMsg(
+        coverImageAltWasNotSaved
+          ? `${savedMessage} The cover image description wasn't saved. Please contact support to complete the update.`
+          : savedMessage,
       );
       if (!postId && id && onSaved) onSaved(id);
     } catch (e) {
@@ -255,6 +357,11 @@ export function PostEditor({
       setSaving(false);
     }
   };
+
+  const seoPreviewTitle = title.trim()
+    ? getBlogSeoTitle(title, seoTitle).slice(0, BLOG_SEO_LIMITS.title)
+    : seoTitle.trim() || "Your post title | EDU TMT Steel";
+  const seoPreviewDescription = getBlogSeoDescription(seoDescription, excerpt, body);
 
   if (loading) return <div className="admin-page">Loading post…</div>;
 
@@ -298,23 +405,143 @@ export function PostEditor({
             />
           </label>
           <label className="admin-field">
-            <span>Excerpt (shown on the blog index)</span>
+            <span>Short summary</span>
             <textarea
               rows={3}
               value={excerpt}
               onChange={(e) => setExcerpt(e.target.value)}
               maxLength={400}
             />
+            <small className="field-counter">{excerpt.length}/400</small>
+            <small className="admin-hint">
+              A plain-language summary shown on the blog index and used when no SEO description is
+              set.
+            </small>
           </label>
-          <label className="admin-field">
-            <span>Body (Markdown supported)</span>
+          <div className="admin-field">
+            <label htmlFor="post-body">
+              <span>Article body</span>
+            </label>
+            <p className="admin-hint">
+              Answer a real project question in plain language. Use paragraph breaks and the
+              toolbar to format the article. Source technical claims, avoid giving structural design
+              advice, and check dates, prices and availability before publishing.
+            </p>
+            <div className="markdown-toolbar" role="toolbar" aria-label="Article formatting">
+              <button
+                type="button"
+                title="Bold"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => insertMarkdown("**", "**", "bold text")}
+              >
+                Bold
+              </button>
+              <button
+                type="button"
+                title="Italic"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => insertMarkdown("_", "_", "italic text")}
+              >
+                Italic
+              </button>
+              <button
+                type="button"
+                title="Strikethrough"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => insertMarkdown("~~", "~~", "strikethrough text")}
+              >
+                Strike
+              </button>
+              <button
+                type="button"
+                title="Heading 2"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => insertMarkdown("## ", "", "Section heading", true)}
+              >
+                H2
+              </button>
+              <button
+                type="button"
+                title="Heading 3"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => insertMarkdown("### ", "", "Subheading", true)}
+              >
+                H3
+              </button>
+              <button
+                type="button"
+                title="Bulleted list"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => insertMarkdown("- ", "", "List item", true)}
+              >
+                Bullets
+              </button>
+              <button
+                type="button"
+                title="Numbered list"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => insertMarkdown("1. ", "", "List item", true)}
+              >
+                Numbered
+              </button>
+              <button
+                type="button"
+                title="Block quote"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => insertMarkdown("> ", "", "Quote", true)}
+              >
+                Quote
+              </button>
+              <button
+                type="button"
+                title="Inline code"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() =>
+                  insertMarkdown(String.fromCharCode(96), String.fromCharCode(96), "code")
+                }
+              >
+                Code
+              </button>
+              <button
+                type="button"
+                title="Add a link"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => insertMarkdown("[", "](https://example.com)", "link text")}
+              >
+                Link
+              </button>
+              <button
+                type="button"
+                title="Add an image"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() =>
+                  insertMarkdown("![", "](https://example.com/image.jpg)", "Image description")
+                }
+              >
+                Image
+              </button>
+              <button
+                type="button"
+                title="Insert a table"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() =>
+                  insertSnippet(
+                    "| Item | Details |\n| --- | --- |\n| Example | Add details |\n",
+                  )
+                }
+              >
+                Table
+              </button>
+            </div>
             <textarea
+              id="post-body"
+              ref={bodyRef}
               rows={18}
               value={body}
               onChange={(e) => setBody(e.target.value)}
               className="editor-body"
             />
-          </label>
+          </div>
 
           {preview && (
             <div className="editor-preview">
@@ -378,6 +605,20 @@ export function PostEditor({
               disabled={coverUploading}
               onChange={(e) => e.target.files?.[0] && uploadCover(e.target.files[0])}
             />
+            {coverImage && (
+              <label className="admin-field">
+                <span>Image description (alt text)</span>
+                <input
+                  value={coverImageAlt}
+                  onChange={(e) => setCoverImageAlt(e.target.value)}
+                  maxLength={180}
+                  placeholder="Describe the useful information in the image"
+                />
+                <small className="admin-hint">
+                  Describe the pictured content in plain language. Keep it relevant to the image.
+                </small>
+              </label>
+            )}
             {coverUploading && <p className="admin-hint">Resizing and uploading variants…</p>}
             {coverImage && (
               <button
@@ -394,7 +635,7 @@ export function PostEditor({
           </div>
 
           <div className="admin-panel">
-            <h3>Taxonomy</h3>
+            <h3>Categories and tags</h3>
             <label className="admin-field">
               <span>Category</span>
               <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
@@ -421,28 +662,49 @@ export function PostEditor({
                 onChange={(e) => setAuthorName(e.target.value)}
                 maxLength={80}
               />
+              <small className="admin-hint">
+                Enter the writer’s public name, or leave blank to credit EDU TMT Steel Limited.
+              </small>
             </label>
           </div>
 
           <div className="admin-panel">
             <h3>SEO</h3>
+            <p className="admin-hint">
+              Use a clear, specific title and summary. Character counts are practical guides, not
+              guarantees; Google may show different wording for a search. Blank fields use your post
+              title and short summary.
+            </p>
             <label className="admin-field">
-              <span>SEO title (≤ 70 chars)</span>
+              <span>SEO title (recommended max {BLOG_SEO_LIMITS.title} characters)</span>
               <input
                 value={seoTitle}
                 onChange={(e) => setSeoTitle(e.target.value)}
-                maxLength={70}
+                maxLength={BLOG_SEO_LIMITS.title}
               />
+              <small className="field-counter">
+                {seoTitle.length}/{BLOG_SEO_LIMITS.title}
+              </small>
             </label>
             <label className="admin-field">
-              <span>SEO description (≤ 160 chars)</span>
+              <span>
+                SEO description (recommended max {BLOG_SEO_LIMITS.description} characters)
+              </span>
               <textarea
                 rows={3}
                 value={seoDescription}
                 onChange={(e) => setSeoDescription(e.target.value)}
-                maxLength={160}
+                maxLength={BLOG_SEO_LIMITS.description}
               />
+              <small className="field-counter">
+                {seoDescription.length}/{BLOG_SEO_LIMITS.description}
+              </small>
             </label>
+            <div className="seo-search-preview" aria-label="Illustrative search result preview">
+              <span className="seo-preview-url">edutmtsteel.com › blog › {slug || "post-slug"}</span>
+              <strong>{seoPreviewTitle}</strong>
+              <span>{seoPreviewDescription}</span>
+            </div>
           </div>
         </aside>
       </div>

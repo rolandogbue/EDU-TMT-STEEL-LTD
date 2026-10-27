@@ -1,5 +1,11 @@
 import defaultLogo from "@/assets/edu-logo.png";
 
+export const SITE_URL = "https://www.edutmtsteel.com";
+
+export function absoluteSiteUrl(path: string) {
+  return new URL(path, SITE_URL).href;
+}
+
 /**
  * Brand configuration.
  * To use a custom logo:

@@ -69,6 +69,7 @@ export type Database = {
           body: string;
           category_id: string | null;
           cover_image: string | null;
+          cover_image_alt: string | null;
           cover_image_srcset: Json | null;
           created_at: string;
           excerpt: string | null;
@@ -87,6 +88,7 @@ export type Database = {
           body?: string;
           category_id?: string | null;
           cover_image?: string | null;
+          cover_image_alt?: string | null;
           cover_image_srcset?: Json | null;
           created_at?: string;
           excerpt?: string | null;
@@ -105,6 +107,7 @@ export type Database = {
           body?: string;
           category_id?: string | null;
           cover_image?: string | null;
+          cover_image_alt?: string | null;
           cover_image_srcset?: Json | null;
           created_at?: string;
           excerpt?: string | null;
